@@ -1,0 +1,45 @@
+{
+  "case_id": "S26-0042900",
+  "lab_id": "LAB-DEMO-01",
+  "date_of_service": "2026-08-18",
+  "date_reported": "2026-08-25T10:30:00",
+  "subspecialty": "surgical",
+  "billing_arrangement": "global",
+  "specimens": [
+    {
+      "specimen_id": "A",
+      "site": "skin, upper back",
+      "procedure_type": "biopsy",
+      "container_label": "A: skin, upper back",
+      "blocks": [
+        {
+          "block_id": "A1",
+          "stains": [
+            {"stain_id": "A1-HE-1", "kind": "he", "ordered": true, "resulted": true, "performed_at": "2026-08-19T09:00:00"}
+          ]
+        }
+      ],
+      "diagnoses": [
+        {
+          "text": "Atypical melanocytic proliferation",
+          "certainty": "qualified",
+          "qualifier": "cannot exclude melanoma in situ"
+        }
+      ]
+    }
+  ],
+  "requisition": {
+    "clinical_indication": "Changing pigmented lesion, upper back, rule out malignancy.",
+    "ordering_provider_npi": "4567890123",
+    "tests_ordered": ["Dermatopathology consultation"],
+    "payer": {
+      "plan": "Demo Commercial PPO",
+      "mac_jurisdiction": "DEMO-MAC-J5",
+      "payer_class": "commercial"
+    }
+  },
+  "documents": [
+    {"document_id": "doc-report", "kind": "report", "file": "documents/report.txt", "received_at": "2026-08-25T10:30:00"},
+    {"document_id": "doc-requisition", "kind": "requisition", "file": "documents/requisition.txt", "received_at": "2026-08-18T08:00:00"}
+  ]
+}

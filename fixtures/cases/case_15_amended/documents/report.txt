@@ -1,0 +1,41 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES
+Surgical Pathology Report -- AMENDED REPORT
+
+Patient: PT-2026-0203                    Accession: S26-0042900
+Sex: M                                    Date Collected: 08/18/2026
+Ordering Provider: K. Nasser, MD (NPI 4567890123)   Date Reported: 08/25/2026
+Amends report originally issued 08/20/2026.
+
+AMENDMENT NOTE:
+Upon secondary review requested by the ordering provider, deeper levels
+were cut from block A1 and the case was referred for an intradepartmental
+consultation. The original diagnosis of compound nevus is withdrawn and
+replaced with the diagnosis below.
+
+CLINICAL HISTORY:
+38-year-old male with a changing pigmented lesion on the upper back,
+present for several months, referred for evaluation to rule out
+malignancy.
+
+SPECIMEN(S) RECEIVED:
+A. Skin, upper back, shave biopsy
+
+GROSS DESCRIPTION:
+Received in formalin labeled "A: skin, upper back" is a single tan-brown
+shave biopsy specimen measuring 0.5 x 0.4 x 0.2 cm. The specimen is
+bisected and entirely submitted in one cassette (A1).
+
+MICROSCOPIC DESCRIPTION:
+Deeper sections of the shave biopsy demonstrate an asymmetric proliferation
+of melanocytes with focal confluence at the dermal-epidermal junction and
+mild cytologic atypia not appreciated on the initial levels. No definite
+dermal mitoses are identified.
+
+DIAGNOSIS (AMENDED):
+A. Skin, upper back, shave biopsy:
+   - Atypical melanocytic proliferation, cannot exclude melanoma in situ.
+
+COMMENT:
+This amended diagnosis supersedes the original report dated 08/20/2026 in
+its entirety. No additional special stains or immunohistochemistry were
+performed.
