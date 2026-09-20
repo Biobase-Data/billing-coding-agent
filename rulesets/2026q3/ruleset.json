@@ -11,13 +11,15 @@
   ],
   "ptp_edit": [],
   "coverage_policy": [
-    {"policy_id": "DEMO-POLICY-SKIN-BX", "mac_jurisdiction": "DEMO-MAC-J5", "code": "88305"},
-    {"policy_id": "DEMO-POLICY-SKIN-BX", "mac_jurisdiction": "DEMO-MAC-J5", "code": "88304"}
+    {"policy_id": "DEMO-POLICY-88305", "mac_jurisdiction": "DEMO-MAC-J5", "code": "88305"},
+    {"policy_id": "DEMO-POLICY-88305", "mac_jurisdiction": "DEMO-MAC-J5", "code": "88304"}
   ],
   "coverage_diagnosis": [
-    {"policy_id": "DEMO-POLICY-SKIN-BX", "icd10": "D22.9"},
-    {"policy_id": "DEMO-POLICY-SKIN-BX", "icd10": "L82.1"},
-    {"policy_id": "DEMO-POLICY-SKIN-BX", "icd10": "L57.0"}
+    {"policy_id": "DEMO-POLICY-88305", "icd10": "D22.9"},
+    {"policy_id": "DEMO-POLICY-88305", "icd10": "L82.1"},
+    {"policy_id": "DEMO-POLICY-88305", "icd10": "L57.0"},
+    {"policy_id": "DEMO-POLICY-88305", "icd10": "D12.6"},
+    {"policy_id": "DEMO-POLICY-88305", "icd10": "K63.5"}
   ],
   "substitution": [
     {

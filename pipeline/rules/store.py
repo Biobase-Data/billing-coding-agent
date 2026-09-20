@@ -36,6 +36,7 @@ class PtpEdit:
 
 @dataclass(frozen=True)
 class Substitution:
+    payer_class: str
     from_code: str
     to_code: str
     condition: str
@@ -113,10 +114,68 @@ class RuleStore:
 
     def substitution(self, ruleset_id: str, payer_class: str, from_code: str) -> Substitution | None:
         row = self._conn.execute(
-            "SELECT from_code, to_code, condition FROM substitution "
+            "SELECT payer_class, from_code, to_code, condition FROM substitution "
             "WHERE ruleset_id = ? AND payer_class = ? AND from_code = ?",
             (ruleset_id, payer_class, from_code),
         ).fetchone()
         if row is None:
             return None
-        return Substitution(from_code=row["from_code"], to_code=row["to_code"], condition=row["condition"])
+        return Substitution(
+            payer_class=row["payer_class"],
+            from_code=row["from_code"],
+            to_code=row["to_code"],
+            condition=row["condition"],
+        )
+
+    # -- bulk fetch, for materializing a pure-data snapshot up front so the
+    # mapper and validator never touch the database themselves. --------
+
+    def all_mue(self, ruleset_id: str) -> dict[str, int]:
+        rows = self._conn.execute(
+            "SELECT code, max_units FROM mue WHERE ruleset_id = ?", (ruleset_id,)
+        ).fetchall()
+        return {r["code"]: r["max_units"] for r in rows}
+
+    def all_ptp_edits(self, ruleset_id: str) -> list[PtpEdit]:
+        rows = self._conn.execute(
+            "SELECT column1, column2, modifier_allowed FROM ptp_edit WHERE ruleset_id = ?",
+            (ruleset_id,),
+        ).fetchall()
+        return [
+            PtpEdit(column1=r["column1"], column2=r["column2"], modifier_allowed=r["modifier_allowed"])
+            for r in rows
+        ]
+
+    def all_coverage_policies(self, ruleset_id: str) -> dict[tuple[str, str], list[str]]:
+        rows = self._conn.execute(
+            "SELECT policy_id, mac_jurisdiction, code FROM coverage_policy WHERE ruleset_id = ?",
+            (ruleset_id,),
+        ).fetchall()
+        result: dict[tuple[str, str], list[str]] = {}
+        for r in rows:
+            key = (r["mac_jurisdiction"], r["code"])
+            result.setdefault(key, []).append(r["policy_id"])
+        return result
+
+    def all_covered_diagnoses(self, ruleset_id: str) -> dict[str, set[str]]:
+        rows = self._conn.execute(
+            "SELECT policy_id, icd10 FROM coverage_diagnosis WHERE ruleset_id = ?",
+            (ruleset_id,),
+        ).fetchall()
+        result: dict[str, set[str]] = {}
+        for r in rows:
+            result.setdefault(r["policy_id"], set()).add(r["icd10"])
+        return result
+
+    def all_substitutions(self, ruleset_id: str) -> list[Substitution]:
+        rows = self._conn.execute(
+            "SELECT payer_class, from_code, to_code, condition FROM substitution WHERE ruleset_id = ?",
+            (ruleset_id,),
+        ).fetchall()
+        return [
+            Substitution(
+                payer_class=r["payer_class"], from_code=r["from_code"],
+                to_code=r["to_code"], condition=r["condition"],
+            )
+            for r in rows
+        ]

@@ -70,8 +70,8 @@ def test_ptp_edit_lookup_finds_reverse_direction(tmp_path):
 
 def test_coverage_linkage(store: RuleStore):
     policies = store.coverage_policies_for_code("2026q3", "DEMO-MAC-J5", "88305")
-    assert "DEMO-POLICY-SKIN-BX" in policies
-    diagnoses = store.covered_diagnoses("2026q3", "DEMO-POLICY-SKIN-BX")
+    assert "DEMO-POLICY-88305" in policies
+    diagnoses = store.covered_diagnoses("2026q3", "DEMO-POLICY-88305")
     assert "D22.9" in diagnoses
     assert "Z00.00" not in diagnoses
 

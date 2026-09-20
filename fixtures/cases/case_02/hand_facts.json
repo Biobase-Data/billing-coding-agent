@@ -1,0 +1,212 @@
+[
+  {
+    "fact_id": "f1-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "ascending colon"
+      ],
+      "container_label": "A. Colon polyp, ascending colon"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1033,
+      "end": 1096,
+      "quoted": "A1: Colonic mucosa with a tubular adenoma, low-grade dysplasia."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f1-dx",
+    "fact_type": "diagnosis",
+    "value": {
+      "text": "tubular adenoma",
+      "certainty": "definitive",
+      "qualifier": null
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1446,
+      "end": 1483,
+      "quoted": "Tubular adenoma, low-grade dysplasia."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f2-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "colon, hepatic flexure"
+      ],
+      "container_label": "B. Colon polyp, hepatic flexure"
+    },
+    "specimen_id": "B",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1097,
+      "end": 1142,
+      "quoted": "B1: Colonic mucosa with a hyperplastic polyp."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f2-dx",
+    "fact_type": "diagnosis",
+    "value": {
+      "text": "hyperplastic polyp",
+      "certainty": "definitive",
+      "qualifier": null
+    },
+    "specimen_id": "B",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1517,
+      "end": 1536,
+      "quoted": "Hyperplastic polyp."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f3-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "transverse colon"
+      ],
+      "container_label": "C. Colon polyp, transverse colon"
+    },
+    "specimen_id": "C",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1143,
+      "end": 1206,
+      "quoted": "C1: Colonic mucosa with a tubular adenoma, low-grade dysplasia."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f3-dx",
+    "fact_type": "diagnosis",
+    "value": {
+      "text": "tubular adenoma",
+      "certainty": "definitive",
+      "qualifier": null
+    },
+    "specimen_id": "C",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1446,
+      "end": 1483,
+      "quoted": "Tubular adenoma, low-grade dysplasia."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f4-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "colon, splenic flexure"
+      ],
+      "container_label": "D. Colon polyp, splenic flexure"
+    },
+    "specimen_id": "D",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1207,
+      "end": 1252,
+      "quoted": "D1: Colonic mucosa with a hyperplastic polyp."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f4-dx",
+    "fact_type": "diagnosis",
+    "value": {
+      "text": "hyperplastic polyp",
+      "certainty": "definitive",
+      "qualifier": null
+    },
+    "specimen_id": "D",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1517,
+      "end": 1536,
+      "quoted": "Hyperplastic polyp."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f5-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "sigmoid colon"
+      ],
+      "container_label": "E. Colon polyp, sigmoid colon"
+    },
+    "specimen_id": "E",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1253,
+      "end": 1322,
+      "quoted": "E1: Colonic mucosa with a tubulovillous adenoma, low-grade dysplasia."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f5-dx",
+    "fact_type": "diagnosis",
+    "value": {
+      "text": "tubulovillous adenoma",
+      "certainty": "definitive",
+      "qualifier": null
+    },
+    "specimen_id": "E",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1693,
+      "end": 1736,
+      "quoted": "Tubulovillous adenoma, low-grade dysplasia."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f6-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "colon, rectum"
+      ],
+      "container_label": "F. Colon polyp, rectum"
+    },
+    "specimen_id": "F",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1323,
+      "end": 1400,
+      "quoted": "F1: Colonic mucosa, unremarkable fragment with no polypoid lesion identified."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f6-dx",
+    "fact_type": "diagnosis",
+    "value": {
+      "text": "benign colonic mucosa, no diagnostic abnormality",
+      "certainty": "negative",
+      "qualifier": null
+    },
+    "specimen_id": "F",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1761,
+      "end": 1810,
+      "quoted": "Benign colonic mucosa, no diagnostic abnormality."
+    },
+    "confidence": "high"
+  }
+]

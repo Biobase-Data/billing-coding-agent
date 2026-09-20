@@ -35,15 +35,21 @@ downloads.
 **Synthetic, explicitly labeled — not a real LCD.** Which MAC jurisdiction
 and payer mix to model is an open decision for Todd (see ASSUMPTIONS.md).
 Rather than invent a fake-but-real-looking LCD identifier, this ruleset
-ships one clearly synthetic policy, `DEMO-POLICY-SKIN-BX`, under the
-already-synthetic jurisdiction `DEMO-MAC-J5`, applying to CPT 88305/88304.
-Its diagnosis list uses real, freely-usable ICD-10-CM codes for common
-skin-biopsy indications (D22.9 melanocytic nevus, L82.1 seborrheic
-keratosis, L57.0 actinic keratosis) — the *codes* are real CMS/WHO
-identifiers with no licensing restriction, but the *policy itself* (which
-diagnoses this fictitious policy covers) is a structural demo fixture, not
-a citation to a real LCD. Replace this table wholesale once Todd names the
-MAC(s) to model.
+ships one clearly synthetic policy, `DEMO-POLICY-88305`, under the
+already-synthetic jurisdiction `DEMO-MAC-J5`, applying to CPT 88305/88304
+regardless of specimen type (real Medicare documentation-requirement
+policies for a level-IV surgical pathology code typically do span many
+specimen types under one policy this way). Its diagnosis list uses real,
+freely-usable ICD-10-CM codes covering the fixture corpus's skin and GI
+specimens (D22.9 melanocytic nevus, L82.1 seborrheic keratosis, L57.0
+actinic keratosis, D12.6 benign neoplasm of colon, K63.5 polyp of colon)
+— the *codes* are real CMS/WHO identifiers with no licensing restriction,
+but the *policy itself* (which diagnoses this fictitious policy covers) is
+a structural demo fixture, not a citation to a real LCD. Deliberately
+missing from the list: D48.5 (neoplasm of uncertain behavior, skin) --
+case 10 exercises "indication present but not on the coverage policy
+list" using exactly that gap. Replace this table wholesale once Todd
+names the MAC(s) to model.
 
 ## Substitution (`substitution` table)
 
