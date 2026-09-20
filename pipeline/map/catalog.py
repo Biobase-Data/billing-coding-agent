@@ -108,6 +108,14 @@ DIAGNOSIS_ICD10_TABLE: dict[str, str] = {
     "tubulovillous adenoma": "D12.6",
     "hyperplastic polyp": "K63.5",
     "atypical melanocytic proliferation": "D48.5",
+    # standard ICD-10-CM code for malignant melanoma of skin, unspecified
+    # (category C43, subcategory C43.9); WHO/CMS public material, high
+    # confidence -- fixture cases 4-5 (IHC-confirmed melanoma workups).
+    "malignant melanoma": "C43.9",
+    # standard ICD-10-CM code for lichen planus, unspecified (L43.9);
+    # WHO/CMS public material, high confidence -- fixture cases 9-10
+    # (coverage-linkage gap demo: deliberately not on the covered list).
+    "lichen planus": "L43.9",
 }
 
 
