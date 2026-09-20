@@ -47,6 +47,8 @@ def test_get_recommendation_returns_case_codes_findings(client):
     assert payload["case"]["case_id"] == "S26-0042110"
     assert len(payload["codes"]["lines"]) == 3
     assert len(payload["findings"]) == 1
+    assert len(payload["facts"]) >= 1
+    assert "evidence" in payload["facts"][0]
 
 
 def test_get_recommendation_404_for_unknown_run(client):

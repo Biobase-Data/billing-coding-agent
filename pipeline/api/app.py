@@ -93,6 +93,7 @@ def get_recommendation(case_id: str, run_id: str):
         "case": _read_json(run_dir / "case.json"),
         "codes": _read_json(run_dir / "codes.json"),
         "findings": _read_json(run_dir / "findings.json"),
+        "facts": _read_json(run_dir / "facts.json"),
         "manifest": _read_json(run_dir / "manifest.json"),
     }
 
