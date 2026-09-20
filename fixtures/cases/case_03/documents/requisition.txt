@@ -1,0 +1,14 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES — TEST REQUISITION
+
+Patient: PT-2026-0158
+Ordering Provider: L. Martins, MD (NPI 3456789012)
+Date of Collection: 08/14/2026
+
+Specimen(s): 1 container labeled "shave biopsies x3: left cheek, right
+cheek, and forehead"
+
+Test(s) Ordered: Dermatopathology consultation, routine processing
+
+Clinical Indication: Multiple actinic keratoses, biopsy for confirmation.
+
+Payer: Demo Commercial PPO

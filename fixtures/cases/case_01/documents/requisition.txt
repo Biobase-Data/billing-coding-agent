@@ -1,0 +1,14 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES — TEST REQUISITION
+
+Patient: PT-2026-0047
+Ordering Provider: J. Alvarez, MD (NPI 1234567890)
+Date of Collection: 08/03/2026
+
+Specimen(s): 1 container, labeled "A: skin, left forearm"
+
+Test(s) Ordered: Dermatopathology consultation, routine processing
+
+Clinical Indication: Pigmented lesion, left forearm, rule out malignancy.
+
+Payer: Demo Commercial PPO
+Insured ID: (synthetic, withheld)

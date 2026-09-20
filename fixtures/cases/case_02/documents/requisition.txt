@@ -1,0 +1,14 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES — TEST REQUISITION
+
+Patient: PT-2026-0091
+Ordering Provider: R. Okafor, MD (NPI 2345678901)
+Date of Collection: 08/10/2026
+
+Specimen(s): 6 containers, labeled A through F by anatomic site (see report)
+
+Test(s) Ordered: Surgical pathology consultation, routine processing, x6
+
+Clinical Indication: Screening colonoscopy, family history of colorectal
+carcinoma, polypectomy x6.
+
+Payer: Demo Commercial PPO
