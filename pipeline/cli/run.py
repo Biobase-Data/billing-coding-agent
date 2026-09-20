@@ -12,7 +12,9 @@ run directory without changing how earlier artifacts are produced:
 
 Phase 4 adds a real ``--facts-source extract`` path calling the model;
 ``hand`` stays available afterward so the deterministic core can always
-be re-verified independent of the model.
+be re-verified independent of the model. ``extract`` requires a live
+ANTHROPIC_API_KEY -- there is no fallback, per the build spec's rule that
+a stage which cannot do something correctly raises rather than guessing.
 """
 
 from __future__ import annotations
@@ -28,6 +30,8 @@ import click
 
 from pipeline.adapters import fixture as fixture_adapter
 from pipeline.extract.hand_facts import load_hand_facts
+from pipeline.extract.runner import DEFAULT_MODEL
+from pipeline.extract import runner as extract_runner
 from pipeline.map.mapper import map_codes
 from pipeline.models.manifest import RunManifest, StageMetrics
 from pipeline.rules import loader as rules_loader
@@ -58,21 +62,36 @@ def run_case(
     ruleset_dirs: list[Path] = DEFAULT_RULESET_DIRS,
     rule_store_db: Path = DEFAULT_RULE_STORE_DB,
     facts_source: str = "hand",
+    model: str = DEFAULT_MODEL,
 ) -> Path:
     """Run the pipeline for one fixture case and return the run directory."""
-    if facts_source != "hand":
-        raise NotImplementedError("facts_source='extract' lands in Phase 4")
+    if facts_source not in ("hand", "extract"):
+        raise ValueError(f"unknown facts_source {facts_source!r}")
 
     case_dir = fixtures_root / case_id
     stage_metrics: dict[str, StageMetrics] = {}
+    prompt_versions: dict[str, str] = {}
+    model_id: str | None = None
 
     t0 = time.monotonic()
     case = fixture_adapter.load_case(case_dir)
     stage_metrics["adapter"] = StageMetrics(wall_time_seconds=time.monotonic() - t0)
 
-    t0 = time.monotonic()
-    facts = load_hand_facts(case_dir, case)
-    stage_metrics["extract"] = StageMetrics(wall_time_seconds=time.monotonic() - t0)
+    if facts_source == "hand":
+        t0 = time.monotonic()
+        facts = load_hand_facts(case_dir, case)
+        stage_metrics["extract"] = StageMetrics(wall_time_seconds=time.monotonic() - t0)
+    else:
+        t0 = time.monotonic()
+        facts, extract_metrics, prompt_versions = extract_runner.extract_facts(case, model=model)
+        for stage_name, m in extract_metrics.items():
+            stage_metrics[f"extract:{stage_name}"] = StageMetrics(
+                wall_time_seconds=m.wall_time_seconds,
+                input_tokens=m.input_tokens,
+                output_tokens=m.output_tokens,
+            )
+        stage_metrics["extract_total"] = StageMetrics(wall_time_seconds=time.monotonic() - t0)
+        model_id = model
 
     rule_store_db.parent.mkdir(parents=True, exist_ok=True)
     rules_loader.build_store(rule_store_db, ruleset_dirs)
@@ -118,7 +137,8 @@ def run_case(
         stages_completed=["adapter", "extract", "map", "validate"],
         ruleset_id=ruleset.ruleset_id,
         ruleset_content_hash=ruleset.content_hash,
-        prompt_versions={"facts_source": facts_source},
+        prompt_versions={"facts_source": facts_source, **prompt_versions},
+        model_id=model_id,
         stage_metrics=stage_metrics,
     )
     (run_dir / "manifest.json").write_text(manifest.model_dump_json(indent=2))
@@ -142,13 +162,14 @@ def run_case(
 )
 @click.option(
     "--facts-source",
-    type=click.Choice(["hand"]),
+    type=click.Choice(["hand", "extract"]),
     default="hand",
     show_default=True,
-    help="'extract' (calling the model) lands in Phase 4",
+    help="'hand' replays fixtures/cases/<id>/hand_facts.json; 'extract' calls the model (needs ANTHROPIC_API_KEY)",
 )
-def main(case_id: str, fixtures_root: Path, runs_root: Path, facts_source: str) -> None:
-    run_dir = run_case(case_id, fixtures_root=fixtures_root, runs_root=runs_root, facts_source=facts_source)
+@click.option("--model", default=DEFAULT_MODEL, show_default=True, help="only used with --facts-source extract")
+def main(case_id: str, fixtures_root: Path, runs_root: Path, facts_source: str, model: str) -> None:
+    run_dir = run_case(case_id, fixtures_root=fixtures_root, runs_root=runs_root, facts_source=facts_source, model=model)
     click.echo(f"wrote run to {run_dir}")
 
 

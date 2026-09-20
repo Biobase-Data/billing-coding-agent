@@ -20,7 +20,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 ALLOWED_DESCRIPTOR_FILES = {REPO_ROOT / "rulesets" / "2026q3" / "cpt_descriptors.json"}
 CODE_KEY_RE = re.compile(r"^[A-Z]?\d{4,5}$")
-IGNORED_DIRS = {".git", "node_modules", ".venv", "venv", "runs", "__pycache__"}
+IGNORED_DIRS = {".git", ".claude", "node_modules", ".venv", "venv", "runs", "__pycache__"}
 
 
 def _iter_json_files():
