@@ -149,7 +149,7 @@ def map_stains(facts: list[Fact], case: Case) -> list[CodeLine]:
     return lines
 
 
-def map_diagnoses(facts: list[Fact]) -> list[CodeLine]:
+def map_diagnoses(facts: list[Fact], case: Case) -> list[CodeLine]:
     """ICD-10 lines from diagnosis facts.
 
     A `negative` certainty diagnosis never produces a code (there is
@@ -158,14 +158,22 @@ def map_diagnoses(facts: list[Fact]) -> list[CodeLine]:
     `text`, never to whatever the qualifier speculates about -- see
     ASSUMPTIONS.md #2. `value["text"]` is always already the presenting
     finding; the speculative language lives only in `qualifier`.
+
+    Some diagnoses (compound nevus, malignant melanoma) select their code
+    by the specimen's site -- see catalog.diagnosis_icd10. A container
+    with more than one site (Specimen.site is None) falls back to the
+    first listed site as a best guess; the ambiguity itself is already
+    flagged independently by the specimen-ambiguity finding.
     """
     diagnosis_facts = _facts_by_type_and_specimen(facts, FactType.DIAGNOSIS)
     lines: list[CodeLine] = []
     for specimen_id in sorted(diagnosis_facts):
+        specimen = case.specimen(specimen_id)
+        site = specimen.site or (specimen.sites[0] if specimen.sites else None)
         for fact in diagnosis_facts[specimen_id]:
             if fact.value["certainty"] == Certainty.NEGATIVE.value:
                 continue
-            code = diagnosis_icd10(fact.value["text"])
+            code = diagnosis_icd10(fact.value["text"], site)
             lines.append(
                 CodeLine(
                     line_id=f"{fact.fact_id}-dx",
@@ -256,7 +264,7 @@ def map_codes(facts: list[Fact], case: Case, ruleset: Ruleset, mapping_data: Map
     lines: list[CodeLine] = []
     lines += map_specimen_units(facts, case)
     lines += map_stains(facts, case)
-    lines += map_diagnoses(facts)
+    lines += map_diagnoses(facts, case)
     lines = apply_component_modifiers(lines, case)
     lines = apply_substitutions(lines, case, mapping_data)
     lines.sort(key=lambda line: line.line_id)

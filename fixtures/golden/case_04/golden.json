@@ -4,7 +4,7 @@
     {"code": "88305", "code_system": "CPT", "units": 1, "modifiers": [], "specimen_id": "A"},
     {"code": "88342", "code_system": "CPT", "units": 1, "modifiers": [], "specimen_id": "A"},
     {"code": "88341", "code_system": "CPT", "units": 3, "modifiers": [], "specimen_id": "A"},
-    {"code": "C43.9", "code_system": "ICD10", "units": 1, "modifiers": [], "specimen_id": "A"}
+    {"code": "C43.59", "code_system": "ICD10", "units": 1, "modifiers": [], "specimen_id": "A"}
   ],
   "expected_findings": []
 }

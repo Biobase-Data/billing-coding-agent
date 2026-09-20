@@ -13,6 +13,8 @@ guessing -- see ASSUMPTIONS.md #3 and #2.
 
 from __future__ import annotations
 
+import re
+
 
 class MappingGapError(ValueError):
     """A fact describes something this catalog has no rule for.
@@ -98,29 +100,137 @@ def stain_code(kind: str) -> str:
 # ("suspicious for", "cannot exclude") diagnosis is coded to the
 # *presenting* finding here, never to the suspected condition -- the
 # outpatient/AP-safe default per ASSUMPTIONS.md #2.
+#
+# "compound nevus" and "malignant melanoma" are handled separately, below,
+# because their ICD-10-CM families (D22.-, C43.-) are subdivided by
+# anatomic site and, for the limbs, laterality -- coding every nevus to
+# the unspecified-site code regardless of the specimen's actual site
+# throws away real specificity the report already gives us. Found via
+# live testing (a user compared this demo's D22.9 output for a
+# right-shoulder nevus against a more specific D22.61 and asked why);
+# verified against icd10data.com/AAPC before adding, not guessed.
 # ---------------------------------------------------------------------------
 
 DIAGNOSIS_ICD10_TABLE: dict[str, str] = {
-    "compound nevus": "D22.9",
     "actinic keratosis": "L57.0",
     "seborrheic keratosis": "L82.1",
     "tubular adenoma": "D12.6",
     "tubulovillous adenoma": "D12.6",
     "hyperplastic polyp": "K63.5",
+    # D48.5 has no site subdivision in ICD-10-CM -- it is already maximally
+    # specific as a single code, unlike the nevus/melanoma families below.
     "atypical melanocytic proliferation": "D48.5",
-    # standard ICD-10-CM code for malignant melanoma of skin, unspecified
-    # (category C43, subcategory C43.9); WHO/CMS public material, high
-    # confidence -- fixture cases 4-5 (IHC-confirmed melanoma workups).
-    "malignant melanoma": "C43.9",
     # standard ICD-10-CM code for lichen planus, unspecified (L43.9);
     # WHO/CMS public material, high confidence -- fixture cases 9-10
     # (coverage-linkage gap demo: deliberately not on the covered list).
     "lichen planus": "L43.9",
 }
 
+# Diagnoses whose ICD-10 family is subdivided by site/laterality, each
+# mapped to the site-suffix -> code table that applies to it.
+_SITE_SPECIFIC_DIAGNOSES = {"compound nevus", "malignant melanoma"}
 
-def diagnosis_icd10(diagnosis_text: str) -> str:
+# D22.- Melanocytic nevi. D22.5 (trunk) and D22.9 (unspecified) are single
+# codes; the limb categories require a laterality suffix (.60/.61/.62 etc).
+_NEVUS_ICD10_BY_SITE_SUFFIX: dict[str, str] = {
+    "lip": "D22.0",
+    "eyelid": "D22.1",
+    "ear": "D22.2",
+    "face": "D22.3",
+    "scalp_neck": "D22.4",
+    "trunk": "D22.5",
+    "upper_limb_unspecified": "D22.60",
+    "upper_limb_right": "D22.61",
+    "upper_limb_left": "D22.62",
+    "lower_limb_unspecified": "D22.70",
+    "lower_limb_right": "D22.71",
+    "lower_limb_left": "D22.72",
+    "unspecified": "D22.9",
+}
+
+# C43.- Malignant melanoma of skin. Same anatomic breakdown as D22.- above
+# (trunk uses C43.59, "other part of trunk" -- C43.51/.52 are anal/breast
+# skin specifically and don't apply to our fixture corpus).
+_MELANOMA_ICD10_BY_SITE_SUFFIX: dict[str, str] = {
+    "lip": "C43.0",
+    "eyelid": "C43.1",
+    "ear": "C43.2",
+    "face": "C43.3",
+    "scalp_neck": "C43.4",
+    "trunk": "C43.59",
+    "upper_limb_unspecified": "C43.60",
+    "upper_limb_right": "C43.61",
+    "upper_limb_left": "C43.62",
+    "lower_limb_unspecified": "C43.70",
+    "lower_limb_right": "C43.71",
+    "lower_limb_left": "C43.72",
+    "unspecified": "C43.9",
+}
+
+_LIP_KEYWORDS = ("lip",)
+_EYELID_KEYWORDS = ("eyelid",)
+_EAR_KEYWORDS = ("ear",)
+_FACE_KEYWORDS = ("face", "cheek", "forehead", "nose", "chin")
+_SCALP_NECK_KEYWORDS = ("scalp", "neck")
+_TRUNK_KEYWORDS = ("trunk", "back", "chest", "abdomen", "flank", "breast", "buttock")
+_UPPER_LIMB_KEYWORDS = ("shoulder", "arm", "forearm", "elbow", "wrist", "hand")
+_LOWER_LIMB_KEYWORDS = ("leg", "calf", "thigh", "hip", "knee", "ankle", "foot")
+_LEFT_KEYWORDS = ("left",)
+_RIGHT_KEYWORDS = ("right",)
+
+
+def _contains_word(text: str, keywords: tuple[str, ...]) -> bool:
+    """Whole-word match only -- a plain substring test would match "ear"
+    inside "forearm" or "arm" inside "pharmacy". Found by a failing test
+    while adding site-specific nevus/melanoma coding."""
+    return any(re.search(rf"\b{re.escape(k)}\b", text) for k in keywords)
+
+
+def _site_suffix_for_skin_neoplasm(site: str | None) -> str:
+    """Map a free-text specimen site to a D22./C43. site-suffix category.
+
+    Unrecognized or missing sites fall back to "unspecified" rather than
+    guessing -- the same posture as an ambiguous multi-site container
+    (ASSUMPTIONS.md #1): code the safe, less-specific line, and let the
+    specimen-ambiguity or documentation findings (already independently
+    checked) tell the coder to confirm it.
+    """
+    if not site:
+        return "unspecified"
+    s = site.lower()
+    if _contains_word(s, _LIP_KEYWORDS):
+        return "lip"
+    if _contains_word(s, _EYELID_KEYWORDS):
+        return "eyelid"
+    if _contains_word(s, _EAR_KEYWORDS):
+        return "ear"
+    if _contains_word(s, _FACE_KEYWORDS):
+        return "face"
+    if _contains_word(s, _SCALP_NECK_KEYWORDS):
+        return "scalp_neck"
+    if _contains_word(s, _TRUNK_KEYWORDS):
+        return "trunk"
+    if _contains_word(s, _UPPER_LIMB_KEYWORDS):
+        if _contains_word(s, _RIGHT_KEYWORDS):
+            return "upper_limb_right"
+        if _contains_word(s, _LEFT_KEYWORDS):
+            return "upper_limb_left"
+        return "upper_limb_unspecified"
+    if _contains_word(s, _LOWER_LIMB_KEYWORDS):
+        if _contains_word(s, _RIGHT_KEYWORDS):
+            return "lower_limb_right"
+        if _contains_word(s, _LEFT_KEYWORDS):
+            return "lower_limb_left"
+        return "lower_limb_unspecified"
+    return "unspecified"
+
+
+def diagnosis_icd10(diagnosis_text: str, site: str | None = None) -> str:
     key = diagnosis_text.strip().lower()
+    if key in _SITE_SPECIFIC_DIAGNOSES:
+        suffix = _site_suffix_for_skin_neoplasm(site)
+        table = _NEVUS_ICD10_BY_SITE_SUFFIX if key == "compound nevus" else _MELANOMA_ICD10_BY_SITE_SUFFIX
+        return table[suffix]
     if key not in DIAGNOSIS_ICD10_TABLE:
         raise MappingGapError(
             f"no ICD-10 mapping for diagnosis text {diagnosis_text!r} -- add it to "

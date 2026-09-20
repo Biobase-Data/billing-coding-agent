@@ -53,7 +53,7 @@ def test_case_01_single_specimen_single_he(store):
 
     codes_by_system = {(l.code_system, l.code) for l in codes.lines}
     assert ("CPT", "88305") in codes_by_system
-    assert ("ICD10", "D22.9") in codes_by_system
+    assert ("ICD10", "D22.62") in codes_by_system  # skin, left forearm -> upper limb, left
     assert len(codes.lines) == 2
 
 
@@ -177,7 +177,7 @@ def test_special_stain_units_count_each_stain():
 
 def test_negative_certainty_produces_no_line():
     facts = [make_fact("dx1", FactType.DIAGNOSIS, {"text": "compound nevus", "certainty": "negative", "qualifier": None})]
-    assert map_diagnoses(facts) == []
+    assert map_diagnoses(facts, make_case()) == []
 
 
 def test_qualified_certainty_codes_the_presenting_finding():
@@ -187,21 +187,63 @@ def test_qualified_certainty_codes_the_presenting_finding():
             {"text": "atypical melanocytic proliferation", "certainty": "qualified", "qualifier": "cannot exclude melanoma in situ"},
         )
     ]
-    lines = map_diagnoses(facts)
+    lines = map_diagnoses(facts, make_case())
     assert len(lines) == 1
     assert lines[0].code == "D48.5"
 
 
 def test_definitive_certainty_codes_directly():
     facts = [make_fact("dx1", FactType.DIAGNOSIS, {"text": "actinic keratosis", "certainty": "definitive", "qualifier": None})]
-    lines = map_diagnoses(facts)
+    lines = map_diagnoses(facts, make_case())
     assert lines[0].code == "L57.0"
 
 
 def test_unmapped_diagnosis_text_raises():
     facts = [make_fact("dx1", FactType.DIAGNOSIS, {"text": "some novel finding", "certainty": "definitive", "qualifier": None})]
     with pytest.raises(MappingGapError):
-        map_diagnoses(facts)
+        map_diagnoses(facts, make_case())
+
+
+@pytest.mark.parametrize(
+    "site,expected_code",
+    [
+        ("skin, left forearm", "D22.62"),
+        ("skin, right shoulder", "D22.61"),
+        ("skin, upper back", "D22.5"),
+        ("skin, left cheek", "D22.3"),
+        ("skin, umbilicus", "D22.9"),  # no keyword matches -- unspecified fallback
+    ],
+)
+def test_nevus_diagnosis_is_coded_by_specimen_site(site, expected_code):
+    case = make_case(specimens=[make_specimen(sites=[site])])
+    facts = [make_fact("dx1", FactType.DIAGNOSIS, {"text": "compound nevus", "certainty": "definitive", "qualifier": None})]
+    lines = map_diagnoses(facts, case)
+    assert lines[0].code == expected_code
+
+
+def test_nevus_diagnosis_multi_site_container_uses_first_site_as_best_guess():
+    """The ambiguity itself is already flagged by check_specimen_ambiguity;
+    the diagnosis code still needs *a* value, so it uses the first listed
+    site rather than falling all the way back to unspecified."""
+    case = make_case(specimens=[make_specimen(sites=["right shoulder", "left calf"])])
+    facts = [make_fact("dx1", FactType.DIAGNOSIS, {"text": "compound nevus", "certainty": "definitive", "qualifier": None})]
+    lines = map_diagnoses(facts, case)
+    assert lines[0].code == "D22.61"
+
+
+@pytest.mark.parametrize(
+    "site,expected_code",
+    [
+        ("skin, right upper back", "C43.59"),
+        ("skin, left calf", "C43.72"),
+        ("skin, umbilicus", "C43.9"),
+    ],
+)
+def test_melanoma_diagnosis_is_coded_by_specimen_site(site, expected_code):
+    case = make_case(specimens=[make_specimen(sites=[site])])
+    facts = [make_fact("dx1", FactType.DIAGNOSIS, {"text": "malignant melanoma", "certainty": "definitive", "qualifier": None})]
+    lines = map_diagnoses(facts, case)
+    assert lines[0].code == expected_code
 
 
 # ---------------------------------------------------------------------------
@@ -231,7 +273,7 @@ def test_component_modifiers_applied_uniformly(arrangement, expected_modifier):
 def test_component_modifiers_never_applied_to_icd10_lines():
     case = make_case(billing_arrangement=BillingArrangement.PROFESSIONAL)
     fact = make_fact("dx1", FactType.DIAGNOSIS, {"text": "compound nevus", "certainty": "definitive", "qualifier": None})
-    lines = map_diagnoses([fact])
+    lines = map_diagnoses([fact], case)
     lines = apply_component_modifiers(lines, case)
     assert lines[0].modifiers == []
 

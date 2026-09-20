@@ -56,7 +56,7 @@ def test_diagnosis_line_changes_from_compound_nevus_to_atypical(two_runs):
 
     removed_codes = {l["code"] for l in diff.lines.removed}
     added_codes = {l["code"] for l in diff.lines.added}
-    assert removed_codes == {"D22.9"}
+    assert removed_codes == {"D22.5"}  # compound nevus, skin/upper back -> trunk
     assert added_codes == {"D48.5"}
     assert diff.lines.changed == []  # the level code (88305) is identical in both
 

@@ -16,11 +16,16 @@
   ],
   "coverage_diagnosis": [
     {"policy_id": "DEMO-POLICY-88305", "icd10": "D22.9"},
+    {"policy_id": "DEMO-POLICY-88305", "icd10": "D22.5"},
+    {"policy_id": "DEMO-POLICY-88305", "icd10": "D22.61"},
+    {"policy_id": "DEMO-POLICY-88305", "icd10": "D22.62"},
     {"policy_id": "DEMO-POLICY-88305", "icd10": "L82.1"},
     {"policy_id": "DEMO-POLICY-88305", "icd10": "L57.0"},
     {"policy_id": "DEMO-POLICY-88305", "icd10": "D12.6"},
     {"policy_id": "DEMO-POLICY-88305", "icd10": "K63.5"},
-    {"policy_id": "DEMO-POLICY-88305", "icd10": "C43.9"}
+    {"policy_id": "DEMO-POLICY-88305", "icd10": "C43.9"},
+    {"policy_id": "DEMO-POLICY-88305", "icd10": "C43.59"},
+    {"policy_id": "DEMO-POLICY-88305", "icd10": "C43.72"}
   ],
   "substitution": [
     {

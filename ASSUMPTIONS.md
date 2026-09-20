@@ -36,6 +36,19 @@ these guesses points back here with a comment.
    see licensing note below). Anything not in the table raises rather than
    guessing a level.
 
+   Diagnosis codes need the same site-awareness and only partly have it:
+   melanocytic nevi (D22.-) and malignant melanoma (C43.-) are coded by
+   the specimen's site and, for the limbs, laterality
+   (`_site_suffix_for_skin_neoplasm` in `map/catalog.py`) rather than the
+   unspecified code, because real ICD-10-CM convention discourages the
+   unspecified parent code when a specific one is available -- found via a
+   user comparing this demo's D22.9 output against a real coder's D22.61
+   for the same right-shoulder specimen. **Colon adenomas/polyps
+   (D12.6/K63.5) still collapse every colonic subsite to one unspecified
+   code**, the same class of simplification, not yet fixed -- flagging it
+   here rather than leaving it silently inconsistent with the nevus/
+   melanoma fix.
+
 4. **Which findings are `blocker` vs `review`.**
    Interim severity table in `validate/severity.py`:
    `blocker` = MUE unit cap exceeded, PTP conflict with no allowed modifier,
