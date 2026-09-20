@@ -1,0 +1,37 @@
+[
+  {
+    "fact_id": "f1-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "skin, volar forearm"
+      ],
+      "container_label": "A: skin, volar forearm"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 534,
+      "end": 570,
+      "quoted": "A. Skin, volar forearm, punch biopsy"
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f2-dx",
+    "fact_type": "diagnosis",
+    "value": {
+      "text": "lichen planus",
+      "certainty": "definitive",
+      "qualifier": null
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1160,
+      "end": 1174,
+      "quoted": "Lichen planus."
+    },
+    "confidence": "high"
+  }
+]

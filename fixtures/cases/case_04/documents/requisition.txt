@@ -1,0 +1,15 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES — TEST REQUISITION
+
+Patient: PT-2026-0091
+Ordering Provider: R. Kim, MD (NPI 4567890123)
+Date of Collection: 08/18/2026
+
+Specimen(s): 1 container, labeled "A: skin, right upper back"
+
+Test(s) Ordered: Dermatopathology consultation with IHC as needed
+
+Clinical Indication: Rapidly enlarging, irregularly pigmented lesion, right
+upper back, clinically suspicious for melanoma.
+
+Payer: Demo Commercial PPO
+Insured ID: (synthetic, withheld)

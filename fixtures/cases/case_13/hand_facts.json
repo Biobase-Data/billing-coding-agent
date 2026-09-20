@@ -1,0 +1,39 @@
+[
+  {
+    "fact_id": "f1-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "skin, right flank"
+      ],
+      "container_label": "A: skin, right flank"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 414,
+      "end": 448,
+      "quoted": "A. Skin, right flank, punch biopsy"
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f2-stain-cdx2",
+    "fact_type": "stain",
+    "value": {
+      "kind": "ihc",
+      "block_id": "A1",
+      "stain_id": "A1-IHC-CDX2",
+      "antibody": "CDX2",
+      "sequence": "additional"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 677,
+      "end": 776,
+      "quoted": "an additional immunostain (CDX2)\nwas performed on block A1 to further characterize the primary site"
+    },
+    "confidence": "high"
+  }
+]

@@ -1,0 +1,43 @@
+{
+  "case_id": "S26-0042417",
+  "lab_id": "LAB-DEMO-01",
+  "date_of_service": "2026-08-19",
+  "date_reported": "2026-08-21T10:45:00",
+  "subspecialty": "derm",
+  "billing_arrangement": "global",
+  "specimens": [
+    {
+      "specimen_id": "A",
+      "site": "skin, left calf",
+      "procedure_type": "biopsy",
+      "container_label": "A: skin, left calf",
+      "blocks": [
+        {
+          "block_id": "A1",
+          "stains": [
+            {"stain_id": "A1-HE-1", "kind": "he", "ordered": true, "resulted": true, "performed_at": "2026-08-20T08:00:00"},
+            {"stain_id": "A1-IHC-1", "kind": "ihc", "antibody": "SOX10", "ordered": true, "resulted": true, "performed_at": "2026-08-20T13:00:00"},
+            {"stain_id": "A1-IHC-2", "kind": "ihc", "antibody": null, "ordered": true, "resulted": true, "performed_at": "2026-08-20T13:00:00"}
+          ]
+        }
+      ],
+      "diagnoses": [
+        {"text": "Malignant melanoma, at least 0.4 mm in measured depth", "certainty": "definitive"}
+      ]
+    }
+  ],
+  "requisition": {
+    "clinical_indication": "Darkly pigmented, asymmetric lesion, left calf, clinically concerning for melanoma.",
+    "ordering_provider_npi": "4567890123",
+    "tests_ordered": ["Dermatopathology consultation with IHC as needed"],
+    "payer": {
+      "plan": "Demo Commercial PPO",
+      "mac_jurisdiction": "DEMO-MAC-J5",
+      "payer_class": "commercial"
+    }
+  },
+  "documents": [
+    {"document_id": "doc-report", "kind": "report", "file": "documents/report.txt", "received_at": "2026-08-21T10:45:00"},
+    {"document_id": "doc-requisition", "kind": "requisition", "file": "documents/requisition.txt", "received_at": "2026-08-19T09:00:00"}
+  ]
+}

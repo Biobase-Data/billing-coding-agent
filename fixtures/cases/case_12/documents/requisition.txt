@@ -1,0 +1,16 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES — TEST REQUISITION
+
+Patient: PT-2026-0178
+Ordering Provider: L. Ferreira, MD (NPI 5678901234)
+Date of Collection: 08/26/2026
+
+Specimen(s): 1 container, labeled "A: skin, right lower leg"
+
+Test(s) Ordered: Dermatopathology consultation; extensive special stain
+panel to exclude infectious etiology in an immunosuppressed patient.
+
+Clinical Indication: Immunosuppressed (renal transplant), crusted,
+ulcerated plaque, right lower leg, rule out infection versus neoplasm.
+
+Payer: Demo Commercial PPO
+Insured ID: (synthetic, withheld)

@@ -1,0 +1,207 @@
+[
+  {
+    "fact_id": "f1-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "skin, right lower leg"
+      ],
+      "container_label": "A: skin, right lower leg"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 635,
+      "end": 673,
+      "quoted": "A. Skin, right lower leg, punch biopsy"
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f2-stain-afb",
+    "fact_type": "stain",
+    "value": {
+      "kind": "special",
+      "block_id": "A1",
+      "stain_id": "A1-AFB-1"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1343,
+      "end": 1390,
+      "quoted": "An AFB stain is negative for acid-fast bacilli."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f3-stain-gms",
+    "fact_type": "stain",
+    "value": {
+      "kind": "special",
+      "block_id": "A1",
+      "stain_id": "A1-GMS-1"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1391,
+      "end": 1436,
+      "quoted": "A GMS stain is\nnegative for fungal organisms."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f4-stain-pas",
+    "fact_type": "stain",
+    "value": {
+      "kind": "special",
+      "block_id": "A1",
+      "stain_id": "A1-PAS-1"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1437,
+      "end": 1524,
+      "quoted": "A PAS stain is negative for fungal\norganisms and shows no basement membrane thickening."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f5-stain-gram",
+    "fact_type": "stain",
+    "value": {
+      "kind": "special",
+      "block_id": "A1",
+      "stain_id": "A1-GRAM-1"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1525,
+      "end": 1574,
+      "quoted": "A Gram stain is\nnegative for bacterial organisms."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f6-stain-ws",
+    "fact_type": "stain",
+    "value": {
+      "kind": "special",
+      "block_id": "A1",
+      "stain_id": "A1-WS-1"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1575,
+      "end": 1626,
+      "quoted": "A Warthin-Starry stain is negative\nfor spirochetes."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f7-stain-cr",
+    "fact_type": "stain",
+    "value": {
+      "kind": "special",
+      "block_id": "A1",
+      "stain_id": "A1-CR-1"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1627,
+      "end": 1680,
+      "quoted": "A Congo red stain is negative for amyloid deposition."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f8-stain-mt",
+    "fact_type": "stain",
+    "value": {
+      "kind": "special",
+      "block_id": "A1",
+      "stain_id": "A1-MT-1"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1681,
+      "end": 1776,
+      "quoted": "A Masson trichrome stain highlights dermal fibrosis without an\nincrease in collagen deposition."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f9-stain-ret",
+    "fact_type": "stain",
+    "value": {
+      "kind": "special",
+      "block_id": "A1",
+      "stain_id": "A1-RET-1"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1777,
+      "end": 1834,
+      "quoted": "A reticulin stain shows preserved\nreticulin architecture."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f10-stain-pb",
+    "fact_type": "stain",
+    "value": {
+      "kind": "special",
+      "block_id": "A1",
+      "stain_id": "A1-PB-1"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1835,
+      "end": 1896,
+      "quoted": "A Prussian blue stain is negative for\nhemosiderin deposition."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f11-stain-muc",
+    "fact_type": "stain",
+    "value": {
+      "kind": "special",
+      "block_id": "A1",
+      "stain_id": "A1-MUC-1"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1897,
+      "end": 1959,
+      "quoted": "A mucicarmine stain is negative for\nmucin-producing organisms."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f12-dx",
+    "fact_type": "diagnosis",
+    "value": {
+      "text": "seborrheic keratosis",
+      "certainty": "definitive",
+      "qualifier": null
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 2017,
+      "end": 2144,
+      "quoted": "Seborrheic keratosis, irritated, with overlying crust; special\n     stains negative for infectious organisms as detailed above."
+    },
+    "confidence": "high"
+  }
+]

@@ -1,0 +1,37 @@
+[
+  {
+    "fact_id": "f1-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "skin, right flank"
+      ],
+      "container_label": "A: skin, right flank"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 518,
+      "end": 552,
+      "quoted": "A. Skin, right flank, shave biopsy"
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f2-dx",
+    "fact_type": "diagnosis",
+    "value": {
+      "text": "atypical melanocytic proliferation",
+      "certainty": "qualified",
+      "qualifier": "cannot exclude melanoma in situ"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1163,
+      "end": 1270,
+      "quoted": "Atypical melanocytic proliferation, cannot exclude melanoma in situ; deeper levels examined without change."
+    },
+    "confidence": "high"
+  }
+]

@@ -1,0 +1,15 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES — TEST REQUISITION
+
+Patient: PT-2026-0129
+Ordering Provider: L. Ferreira, MD (NPI 5678901234)
+Date of Collection: 08/21/2026
+
+Specimen(s): 1 container, labeled "A: skin, upper chest"
+
+Test(s) Ordered: Dermatopathology consultation
+
+Clinical Indication: Slowly growing, waxy, "stuck-on" papule, upper
+chest, rule out seborrheic keratosis versus other lesion.
+
+Payer: Demo Commercial PPO
+Insured ID: (synthetic, withheld)

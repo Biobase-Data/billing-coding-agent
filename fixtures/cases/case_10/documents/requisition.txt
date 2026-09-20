@@ -1,0 +1,15 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES — TEST REQUISITION
+
+Patient: PT-2026-0150
+Ordering Provider: L. Ferreira, MD (NPI 5678901234)
+Date of Collection: 08/24/2026
+
+Specimen(s): 1 container, labeled "A: skin, volar forearm"
+
+Test(s) Ordered: Dermatopathology consultation
+
+Clinical Indication: Pruritic, violaceous, polygonal-papule rash, volar
+forearm, biopsy for diagnosis.
+
+Payer: Demo Commercial PPO
+Insured ID: (synthetic, withheld)

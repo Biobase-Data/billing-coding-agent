@@ -1,0 +1,37 @@
+[
+  {
+    "fact_id": "f1-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "skin, left wrist"
+      ],
+      "container_label": "A: skin, left wrist"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 400,
+      "end": 433,
+      "quoted": "A. Skin, left wrist, punch biopsy"
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f2-dx",
+    "fact_type": "diagnosis",
+    "value": {
+      "text": "lichen planus",
+      "certainty": "definitive",
+      "qualifier": null
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1017,
+      "end": 1031,
+      "quoted": "Lichen planus."
+    },
+    "confidence": "high"
+  }
+]

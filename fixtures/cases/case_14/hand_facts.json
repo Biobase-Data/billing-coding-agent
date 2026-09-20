@@ -1,0 +1,37 @@
+[
+  {
+    "fact_id": "f1-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "skin, right shoulder"
+      ],
+      "container_label": "A: skin, right shoulder"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 517,
+      "end": 554,
+      "quoted": "A. Skin, right shoulder, shave biopsy"
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f2-dx",
+    "fact_type": "diagnosis",
+    "value": {
+      "text": "compound nevus",
+      "certainty": "definitive",
+      "qualifier": null
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1101,
+      "end": 1116,
+      "quoted": "Compound nevus."
+    },
+    "confidence": "high"
+  }
+]

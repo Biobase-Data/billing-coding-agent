@@ -1,0 +1,54 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES
+Surgical Pathology Report
+
+Patient: PT-2026-0163                    Accession: S26-0042650
+DOB: (withheld, synthetic)               Date Collected: 08/25/2026
+Sex: M                                   Date Received: 08/25/2026
+Ordering Provider: T. Okafor, MD (NPI 6789012345)   Date Reported: 08/27/2026
+
+CLINICAL HISTORY:
+66-year-old male with a persistently elevated PSA and a prior
+inconclusive standard 12-core biopsy; urology proceeded with a
+transperineal saturation biopsy of the prostate.
+
+SPECIMEN(S) RECEIVED:
+A. Prostate, right base, needle core biopsy
+B. Prostate, right mid, needle core biopsy
+C. Prostate, right apex, needle core biopsy
+D. Prostate, left base, needle core biopsy
+E. Prostate, left mid, needle core biopsy
+F. Prostate, left apex, needle core biopsy
+G. Prostate, right lateral, needle core biopsy
+H. Prostate, left lateral, needle core biopsy
+I. Prostate, midline apex, needle core biopsy
+J. Prostate, midline base, needle core biopsy
+
+GROSS DESCRIPTION:
+Ten separately labeled containers (A through J), each containing one
+or two thin, tan, needle core biopsy fragments of prostate tissue,
+consistent with a saturation biopsy technique. Each core is submitted
+entirely in its own cassette (A1 through J1).
+
+MICROSCOPIC DESCRIPTION:
+Sections from all ten cores (A1-J1) show benign prostatic glandular
+and stromal tissue with a patchy chronic inflammatory infiltrate.
+Occasional cores show mild glandular crowding without cytologic
+atypia. No high-grade prostatic intraepithelial neoplasia and no
+carcinoma are identified in any of the ten cores.
+
+DIAGNOSIS:
+A. Prostate, right base, needle core biopsy: Benign prostatic tissue with chronic inflammation, no malignancy identified.
+B. Prostate, right mid, needle core biopsy: Benign prostatic tissue, no malignancy identified.
+C. Prostate, right apex, needle core biopsy: Benign prostatic tissue, no malignancy identified.
+D. Prostate, left base, needle core biopsy: Benign prostatic tissue with chronic inflammation, no malignancy identified.
+E. Prostate, left mid, needle core biopsy: Benign prostatic tissue, no malignancy identified.
+F. Prostate, left apex, needle core biopsy: Benign prostatic tissue, no malignancy identified.
+G. Prostate, right lateral, needle core biopsy: Benign prostatic tissue, no malignancy identified.
+H. Prostate, left lateral, needle core biopsy: Benign prostatic tissue, no malignancy identified.
+I. Prostate, midline apex, needle core biopsy: Benign prostatic tissue, no malignancy identified.
+J. Prostate, midline base, needle core biopsy: Benign prostatic tissue, no malignancy identified.
+
+COMMENT:
+This saturation biopsy (10 cores from a single encounter) is billed per
+Medicare policy as HCPCS G0416 rather than as ten individual surgical
+pathology levels.

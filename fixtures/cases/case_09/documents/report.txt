@@ -1,0 +1,32 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES
+Surgical Pathology Report
+
+Patient: PT-2026-0142                    Accession: S26-0042571
+DOB: (withheld, synthetic)               Date Collected: 08/23/2026
+Sex: M                                   Date Received: 08/23/2026
+Ordering Provider: L. Ferreira, MD (NPI 5678901234)   Date Reported: 08/25/2026
+
+CLINICAL HISTORY:
+See requisition.
+
+SPECIMEN(S) RECEIVED:
+A. Skin, left wrist, punch biopsy
+
+GROSS DESCRIPTION:
+Received in formalin labeled "A: skin, left wrist" is a single tan
+punch biopsy specimen measuring 0.4 x 0.4 x 0.3 cm. The specimen is
+bisected and entirely submitted in one cassette (A1).
+
+MICROSCOPIC DESCRIPTION:
+Sections show compact hyperkeratosis, wedge-shaped hypergranulosis, and
+a dense, band-like lymphocytic infiltrate at the dermal-epidermal
+junction with vacuolar degeneration of the basal layer and scattered
+necrotic keratinocytes (Civatte bodies). A sawtooth pattern of the
+rete ridges is noted.
+
+DIAGNOSIS:
+A. Skin, left wrist, punch biopsy:
+   - Lichen planus.
+
+COMMENT:
+The histologic findings are classic for lichen planus.

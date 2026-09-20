@@ -1,0 +1,37 @@
+[
+  {
+    "fact_id": "f1-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "skin, upper chest"
+      ],
+      "container_label": "A: skin, upper chest"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 469,
+      "end": 503,
+      "quoted": "A. Skin, upper chest, shave biopsy"
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f2-dx",
+    "fact_type": "diagnosis",
+    "value": {
+      "text": "seborrheic keratosis",
+      "certainty": "definitive",
+      "qualifier": null
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1220,
+      "end": 1241,
+      "quoted": "Seborrheic keratosis."
+    },
+    "confidence": "high"
+  }
+]

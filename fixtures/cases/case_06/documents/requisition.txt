@@ -1,0 +1,16 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES — TEST REQUISITION
+
+Patient: PT-2026-0118
+Ordering Provider: L. Ferreira, MD (NPI 5678901234)
+Date of Collection: 08/20/2026
+
+Specimen(s): 1 container, labeled "A: skin, right lower leg"
+
+Test(s) Ordered: Dermatopathology consultation; PAS stain requested to
+rule out fungal infection.
+
+Clinical Indication: Scaly, hyperkeratotic plaque, right lower leg, rule
+out actinic keratosis versus tinea corporis.
+
+Payer: Demo Commercial PPO
+Insured ID: (synthetic, withheld)
