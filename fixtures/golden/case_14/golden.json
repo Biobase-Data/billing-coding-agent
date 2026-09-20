@@ -1,0 +1,8 @@
+{
+  "unreviewed": true,
+  "expected_lines": [
+    {"code": "88305", "code_system": "CPT", "units": 1, "modifiers": ["26"], "specimen_id": "A"},
+    {"code": "D22.9", "code_system": "ICD10", "units": 1, "modifiers": [], "specimen_id": "A"}
+  ],
+  "expected_findings": []
+}

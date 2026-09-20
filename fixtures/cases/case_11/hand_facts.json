@@ -1,0 +1,182 @@
+[
+  {
+    "fact_id": "fA-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "prostate, right base"
+      ],
+      "container_label": "A. Prostate, right base, needle core biopsy"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 555,
+      "end": 598,
+      "quoted": "A. Prostate, right base, needle core biopsy"
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "fB-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "prostate, right mid"
+      ],
+      "container_label": "B. Prostate, right mid, needle core biopsy"
+    },
+    "specimen_id": "B",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 599,
+      "end": 641,
+      "quoted": "B. Prostate, right mid, needle core biopsy"
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "fC-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "prostate, right apex"
+      ],
+      "container_label": "C. Prostate, right apex, needle core biopsy"
+    },
+    "specimen_id": "C",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 642,
+      "end": 685,
+      "quoted": "C. Prostate, right apex, needle core biopsy"
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "fD-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "prostate, left base"
+      ],
+      "container_label": "D. Prostate, left base, needle core biopsy"
+    },
+    "specimen_id": "D",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 686,
+      "end": 728,
+      "quoted": "D. Prostate, left base, needle core biopsy"
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "fE-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "prostate, left mid"
+      ],
+      "container_label": "E. Prostate, left mid, needle core biopsy"
+    },
+    "specimen_id": "E",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 729,
+      "end": 770,
+      "quoted": "E. Prostate, left mid, needle core biopsy"
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "fF-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "prostate, left apex"
+      ],
+      "container_label": "F. Prostate, left apex, needle core biopsy"
+    },
+    "specimen_id": "F",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 771,
+      "end": 813,
+      "quoted": "F. Prostate, left apex, needle core biopsy"
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "fG-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "prostate, right lateral"
+      ],
+      "container_label": "G. Prostate, right lateral, needle core biopsy"
+    },
+    "specimen_id": "G",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 814,
+      "end": 860,
+      "quoted": "G. Prostate, right lateral, needle core biopsy"
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "fH-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "prostate, left lateral"
+      ],
+      "container_label": "H. Prostate, left lateral, needle core biopsy"
+    },
+    "specimen_id": "H",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 861,
+      "end": 906,
+      "quoted": "H. Prostate, left lateral, needle core biopsy"
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "fI-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "prostate, midline apex"
+      ],
+      "container_label": "I. Prostate, midline apex, needle core biopsy"
+    },
+    "specimen_id": "I",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 907,
+      "end": 952,
+      "quoted": "I. Prostate, midline apex, needle core biopsy"
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "fJ-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "prostate, midline base"
+      ],
+      "container_label": "J. Prostate, midline base, needle core biopsy"
+    },
+    "specimen_id": "J",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 953,
+      "end": 998,
+      "quoted": "J. Prostate, midline base, needle core biopsy"
+    },
+    "confidence": "high"
+  }
+]

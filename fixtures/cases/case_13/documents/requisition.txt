@@ -1,0 +1,18 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES — TEST REQUISITION (ADDENDUM REQUEST)
+
+Patient: PT-2026-0185
+Ordering Provider: T. Okafor, MD (NPI 6789012345)
+Date of Original Collection: 08/15/2026
+
+Specimen(s): 1 container, labeled "A: skin, right flank" (original
+accession S26-0042731, block A1 retained in the lab)
+
+Test(s) Ordered: Additional immunostain (CDX2) on block A1 at
+treating oncologist's request, to further characterize tumor primary.
+
+Clinical Indication: Metastatic poorly differentiated carcinoma of
+uncertain primary; further immunohistochemical characterization
+requested.
+
+Payer: Demo Commercial PPO
+Insured ID: (synthetic, withheld)

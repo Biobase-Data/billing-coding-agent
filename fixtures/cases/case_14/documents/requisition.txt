@@ -1,0 +1,17 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES — TEST REQUISITION
+
+Patient: PT-2026-0192
+Ordering Provider: J. Alvarez, MD (NPI 1234567890)
+Date of Collection: 08/27/2026
+
+Specimen(s): 1 container, labeled "A: skin, right shoulder"
+
+Test(s) Ordered: Dermatopathology consultation, professional
+interpretation only (technical component performed at referring
+facility)
+
+Clinical Indication: Stable, tan-brown papule, right shoulder, biopsy
+at patient's request.
+
+Payer: Demo Commercial PPO
+Insured ID: (synthetic, withheld)

@@ -1,0 +1,26 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES
+Surgical Pathology Report — ADDENDUM
+
+Patient: PT-2026-0185                    Accession: S26-0042731
+DOB: (withheld, synthetic)               Date Collected: 08/15/2026
+Sex: F                                   Date Received: 08/15/2026
+Ordering Provider: T. Okafor, MD (NPI 6789012345)   Date Reported: 08/15/2026
+Addendum Reported: 08/20/2026
+
+ORIGINAL DIAGNOSIS (08/15/2026):
+A. Skin, right flank, punch biopsy: Poorly differentiated carcinoma,
+consistent with cutaneous metastasis; original CK7/CK20 immunopanel
+performed on block A1 favored a lower gastrointestinal primary.
+
+ADDENDUM (08/20/2026):
+At the treating oncologist's request, an additional immunostain (CDX2)
+was performed on block A1 to further characterize the primary site,
+following the original diagnosis of poorly differentiated carcinoma;
+see the original report dated 08/15/2026 for the initial CK7/CK20
+immunopanel. CDX2 is diffusely positive in the tumor cells, supporting
+a lower gastrointestinal (colorectal) primary.
+
+REVISED COMMENT:
+The CDX2 result is consistent with, and further supports, the
+gastrointestinal primary favored on the original CK7/CK20 panel. The
+original diagnosis is not changed by this addendum.

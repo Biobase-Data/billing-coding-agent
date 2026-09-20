@@ -1,0 +1,18 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES — TEST REQUISITION
+
+Patient: PT-2026-0163
+Ordering Provider: T. Okafor, MD (NPI 6789012345)
+Date of Collection: 08/25/2026
+
+Specimen(s): 10 containers (A-J), transperineal saturation prostate
+needle core biopsies
+
+Test(s) Ordered: Surgical pathology consultation, prostate saturation
+biopsy protocol
+
+Clinical Indication: Persistently elevated PSA following an
+inconclusive standard 12-core biopsy; saturation biopsy performed for
+further evaluation.
+
+Payer: Demo Medicare Part B
+Insured ID: (synthetic, withheld)

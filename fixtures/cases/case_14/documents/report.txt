@@ -1,0 +1,33 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES
+Surgical Pathology Report
+
+Patient: PT-2026-0192                    Accession: S26-0042760
+DOB: (withheld, synthetic)               Date Collected: 08/27/2026
+Sex: M                                   Date Received: 08/27/2026
+Ordering Provider: J. Alvarez, MD (NPI 1234567890)   Date Reported: 08/29/2026
+
+CLINICAL HISTORY:
+50-year-old male with a stable, tan-brown papule on the right shoulder,
+present for years, recently biopsied at the patient's request.
+
+SPECIMEN(S) RECEIVED:
+A. Skin, right shoulder, shave biopsy
+
+GROSS DESCRIPTION:
+Received in formalin labeled "A: skin, right shoulder" is a single
+tan-brown shave biopsy specimen measuring 0.4 x 0.3 x 0.2 cm. The
+specimen is bisected and entirely submitted in one cassette (A1).
+
+MICROSCOPIC DESCRIPTION:
+Sections of the shave biopsy demonstrate a well-circumscribed
+proliferation of nested melanocytes confined to the papillary dermis
+with maturation at the base. No significant cytologic atypia, mitotic
+activity, or pagetoid spread is identified.
+
+DIAGNOSIS:
+A. Skin, right shoulder, shave biopsy:
+   - Compound nevus.
+
+COMMENT:
+This report reflects the professional component only; the technical
+component is billed separately by the referring facility.

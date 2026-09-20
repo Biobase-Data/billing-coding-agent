@@ -1,0 +1,51 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES
+Surgical Pathology Report
+
+Patient: PT-2026-0178                    Accession: S26-0042699
+DOB: (withheld, synthetic)               Date Collected: 08/26/2026
+Sex: M                                   Date Received: 08/26/2026
+Ordering Provider: L. Ferreira, MD (NPI 5678901234)   Date Reported: 08/29/2026
+
+CLINICAL HISTORY:
+61-year-old male, immunosuppressed following renal transplant, with a
+crusted, ulcerated plaque on the right lower leg, clinically concerning
+for an infectious versus neoplastic process; extensive special stain
+workup requested given the differential.
+
+SPECIMEN(S) RECEIVED:
+A. Skin, right lower leg, punch biopsy
+
+GROSS DESCRIPTION:
+Received in formalin labeled "A: skin, right lower leg" is a single
+tan-brown, crusted punch biopsy specimen measuring 0.6 x 0.6 x 0.3 cm.
+The specimen is bisected and entirely submitted in one cassette (A1).
+
+MICROSCOPIC DESCRIPTION:
+Sections show an exophytic, hyperkeratotic and papillomatous
+proliferation of basaloid keratinocytes with a "stuck-on" silhouette
+and overlying serum crust, with a mixed inflammatory infiltrate in the
+adjacent dermis. Given the immunosuppressed clinical setting, an
+extensive special stain panel was performed to exclude an infectious
+etiology before finalizing the diagnosis as a benign process.
+
+SPECIAL STAINS:
+An AFB stain is negative for acid-fast bacilli. A GMS stain is
+negative for fungal organisms. A PAS stain is negative for fungal
+organisms and shows no basement membrane thickening. A Gram stain is
+negative for bacterial organisms. A Warthin-Starry stain is negative
+for spirochetes. A Congo red stain is negative for amyloid deposition.
+A Masson trichrome stain highlights dermal fibrosis without an
+increase in collagen deposition. A reticulin stain shows preserved
+reticulin architecture. A Prussian blue stain is negative for
+hemosiderin deposition. A mucicarmine stain is negative for
+mucin-producing organisms.
+
+DIAGNOSIS:
+A. Skin, right lower leg, punch biopsy:
+   - Seborrheic keratosis, irritated, with overlying crust; special
+     stains negative for infectious organisms as detailed above.
+
+COMMENT:
+The extensive special stain panel excludes the infectious etiologies
+in the clinical differential; the lesion is a benign, irritated
+seborrheic keratosis.

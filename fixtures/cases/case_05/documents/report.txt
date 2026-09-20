@@ -1,0 +1,42 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES
+Surgical Pathology Report
+
+Patient: PT-2026-0104                    Accession: S26-0042417
+DOB: (withheld, synthetic)               Date Collected: 08/19/2026
+Sex: F                                   Date Received: 08/19/2026
+Ordering Provider: R. Kim, MD (NPI 4567890123)   Date Reported: 08/21/2026
+
+CLINICAL HISTORY:
+67-year-old female with a darkly pigmented, asymmetric lesion on the
+left calf, clinically concerning for melanoma.
+
+SPECIMEN(S) RECEIVED:
+A. Skin, left calf, shave biopsy
+
+GROSS DESCRIPTION:
+Received in formalin labeled "A: skin, left calf" is a single dark-brown
+shave biopsy specimen measuring 0.8 x 0.6 x 0.2 cm. The specimen is
+bisected and entirely submitted in one cassette (A1).
+
+MICROSCOPIC DESCRIPTION:
+Sections show a broad, asymmetric proliferation of atypical melanocytes
+along the dermal-epidermal junction with focal nesting and scattered
+single-cell extension into the upper spinous layer. Rare mitotic
+figures are identified in the papillary dermis.
+
+IMMUNOHISTOCHEMISTRY:
+An immunostain for SOX10 was performed on block A1 and is positive,
+highlighting an increased density of atypical melanocytes along the
+junction and within the papillary dermis. An additional immunostain
+was performed and is also positive in the same distribution, further
+supporting melanocytic lineage.
+
+DIAGNOSIS:
+A. Skin, left calf, shave biopsy:
+   - Malignant melanoma, at least 0.4 mm in measured depth (see comment).
+
+COMMENT:
+The immunohistochemical findings support the above diagnosis. The
+requesting pathologist has been notified that the second stain's
+antibody name was not recorded in the case log at sign-out and should
+be confirmed before final billing.

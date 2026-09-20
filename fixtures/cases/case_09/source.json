@@ -1,0 +1,41 @@
+{
+  "case_id": "S26-0042571",
+  "lab_id": "LAB-DEMO-01",
+  "date_of_service": "2026-08-23",
+  "date_reported": "2026-08-25T09:50:00",
+  "subspecialty": "derm",
+  "billing_arrangement": "global",
+  "specimens": [
+    {
+      "specimen_id": "A",
+      "site": "skin, left wrist",
+      "procedure_type": "biopsy",
+      "container_label": "A: skin, left wrist",
+      "blocks": [
+        {
+          "block_id": "A1",
+          "stains": [
+            {"stain_id": "A1-HE-1", "kind": "he", "ordered": true, "resulted": true, "performed_at": "2026-08-24T08:00:00"}
+          ]
+        }
+      ],
+      "diagnoses": [
+        {"text": "Lichen planus", "certainty": "definitive"}
+      ]
+    }
+  ],
+  "requisition": {
+    "clinical_indication": null,
+    "ordering_provider_npi": "5678901234",
+    "tests_ordered": ["Dermatopathology consultation"],
+    "payer": {
+      "plan": "Demo Commercial PPO",
+      "mac_jurisdiction": "DEMO-MAC-J5",
+      "payer_class": "commercial"
+    }
+  },
+  "documents": [
+    {"document_id": "doc-report", "kind": "report", "file": "documents/report.txt", "received_at": "2026-08-25T09:50:00"},
+    {"document_id": "doc-requisition", "kind": "requisition", "file": "documents/requisition.txt", "received_at": "2026-08-23T09:00:00"}
+  ]
+}

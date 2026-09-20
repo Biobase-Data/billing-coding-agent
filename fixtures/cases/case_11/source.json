@@ -1,0 +1,44 @@
+{
+  "case_id": "S26-0042650",
+  "lab_id": "LAB-DEMO-01",
+  "date_of_service": "2026-08-25",
+  "date_reported": "2026-08-27T14:20:00",
+  "subspecialty": "surgical",
+  "billing_arrangement": "global",
+  "specimens": [
+    {"specimen_id": "A", "site": "prostate, right base", "procedure_type": "biopsy", "container_label": "A. Prostate, right base, needle core biopsy",
+      "blocks": [{"block_id": "A1", "stains": [{"stain_id": "A1-HE-1", "kind": "he", "ordered": true, "resulted": true, "performed_at": "2026-08-26T08:00:00"}]}]},
+    {"specimen_id": "B", "site": "prostate, right mid", "procedure_type": "biopsy", "container_label": "B. Prostate, right mid, needle core biopsy",
+      "blocks": [{"block_id": "B1", "stains": [{"stain_id": "B1-HE-1", "kind": "he", "ordered": true, "resulted": true, "performed_at": "2026-08-26T08:00:00"}]}]},
+    {"specimen_id": "C", "site": "prostate, right apex", "procedure_type": "biopsy", "container_label": "C. Prostate, right apex, needle core biopsy",
+      "blocks": [{"block_id": "C1", "stains": [{"stain_id": "C1-HE-1", "kind": "he", "ordered": true, "resulted": true, "performed_at": "2026-08-26T08:00:00"}]}]},
+    {"specimen_id": "D", "site": "prostate, left base", "procedure_type": "biopsy", "container_label": "D. Prostate, left base, needle core biopsy",
+      "blocks": [{"block_id": "D1", "stains": [{"stain_id": "D1-HE-1", "kind": "he", "ordered": true, "resulted": true, "performed_at": "2026-08-26T08:00:00"}]}]},
+    {"specimen_id": "E", "site": "prostate, left mid", "procedure_type": "biopsy", "container_label": "E. Prostate, left mid, needle core biopsy",
+      "blocks": [{"block_id": "E1", "stains": [{"stain_id": "E1-HE-1", "kind": "he", "ordered": true, "resulted": true, "performed_at": "2026-08-26T08:00:00"}]}]},
+    {"specimen_id": "F", "site": "prostate, left apex", "procedure_type": "biopsy", "container_label": "F. Prostate, left apex, needle core biopsy",
+      "blocks": [{"block_id": "F1", "stains": [{"stain_id": "F1-HE-1", "kind": "he", "ordered": true, "resulted": true, "performed_at": "2026-08-26T08:00:00"}]}]},
+    {"specimen_id": "G", "site": "prostate, right lateral", "procedure_type": "biopsy", "container_label": "G. Prostate, right lateral, needle core biopsy",
+      "blocks": [{"block_id": "G1", "stains": [{"stain_id": "G1-HE-1", "kind": "he", "ordered": true, "resulted": true, "performed_at": "2026-08-26T08:00:00"}]}]},
+    {"specimen_id": "H", "site": "prostate, left lateral", "procedure_type": "biopsy", "container_label": "H. Prostate, left lateral, needle core biopsy",
+      "blocks": [{"block_id": "H1", "stains": [{"stain_id": "H1-HE-1", "kind": "he", "ordered": true, "resulted": true, "performed_at": "2026-08-26T08:00:00"}]}]},
+    {"specimen_id": "I", "site": "prostate, midline apex", "procedure_type": "biopsy", "container_label": "I. Prostate, midline apex, needle core biopsy",
+      "blocks": [{"block_id": "I1", "stains": [{"stain_id": "I1-HE-1", "kind": "he", "ordered": true, "resulted": true, "performed_at": "2026-08-26T08:00:00"}]}]},
+    {"specimen_id": "J", "site": "prostate, midline base", "procedure_type": "biopsy", "container_label": "J. Prostate, midline base, needle core biopsy",
+      "blocks": [{"block_id": "J1", "stains": [{"stain_id": "J1-HE-1", "kind": "he", "ordered": true, "resulted": true, "performed_at": "2026-08-26T08:00:00"}]}]}
+  ],
+  "requisition": {
+    "clinical_indication": "Persistently elevated PSA following an inconclusive standard 12-core biopsy; saturation biopsy performed for further evaluation.",
+    "ordering_provider_npi": "6789012345",
+    "tests_ordered": ["Surgical pathology consultation", "prostate saturation biopsy protocol"],
+    "payer": {
+      "plan": "Demo Medicare Part B",
+      "mac_jurisdiction": "DEMO-MAC-J5",
+      "payer_class": "medicare"
+    }
+  },
+  "documents": [
+    {"document_id": "doc-report", "kind": "report", "file": "documents/report.txt", "received_at": "2026-08-27T14:20:00"},
+    {"document_id": "doc-requisition", "kind": "requisition", "file": "documents/requisition.txt", "received_at": "2026-08-25T09:00:00"}
+  ]
+}
