@@ -1,0 +1,11 @@
+{
+  "_notice": "PLACEHOLDER — no AMA licence. These are not real CPT descriptors. A licensed descriptor file drops in at this same path/shape once Biobase has a CPT licence; see ASSUMPTIONS.md.",
+  "88304": "PLACEHOLDER - surgical pathology level, see licensed descriptor file",
+  "88305": "PLACEHOLDER - surgical pathology level, see licensed descriptor file",
+  "88307": "PLACEHOLDER - surgical pathology level, see licensed descriptor file",
+  "88312": "PLACEHOLDER - special stain, group I, see licensed descriptor file",
+  "88313": "PLACEHOLDER - special stain, group II, see licensed descriptor file",
+  "88341": "PLACEHOLDER - immunohistochemistry, additional antibody, see licensed descriptor file",
+  "88342": "PLACEHOLDER - immunohistochemistry, initial antibody, see licensed descriptor file",
+  "G0416": "PLACEHOLDER - HCPCS Level II code, publicly defined by CMS, descriptor withheld pending review, see licensed descriptor file"
+}

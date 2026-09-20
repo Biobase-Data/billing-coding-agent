@@ -1,0 +1,30 @@
+{
+  "ruleset_id": "2026q3",
+  "effective_from": "2026-07-01",
+  "effective_to": null,
+  "source_note": "Public CMS NCCI/MUE material for the codes the fixture corpus exercises, pulled 2026-09-20; see SOURCES.md in this directory for the row-by-row citations and the network-access caveats on each one. Coverage policy rows are an explicitly synthetic demo fixture, not a real LCD.",
+  "mue": [
+    {"code": "88341", "max_units": 13, "adjudication_type": "date_of_service"},
+    {"code": "88342", "max_units": 1, "adjudication_type": "claim_line"},
+    {"code": "88312", "max_units": 9, "adjudication_type": "date_of_service"},
+    {"code": "88313", "max_units": 8, "adjudication_type": "date_of_service"}
+  ],
+  "ptp_edit": [],
+  "coverage_policy": [
+    {"policy_id": "DEMO-POLICY-SKIN-BX", "mac_jurisdiction": "DEMO-MAC-J5", "code": "88305"},
+    {"policy_id": "DEMO-POLICY-SKIN-BX", "mac_jurisdiction": "DEMO-MAC-J5", "code": "88304"}
+  ],
+  "coverage_diagnosis": [
+    {"policy_id": "DEMO-POLICY-SKIN-BX", "icd10": "D22.9"},
+    {"policy_id": "DEMO-POLICY-SKIN-BX", "icd10": "L82.1"},
+    {"policy_id": "DEMO-POLICY-SKIN-BX", "icd10": "L57.0"}
+  ],
+  "substitution": [
+    {
+      "payer_class": "medicare",
+      "from_code": "88305",
+      "to_code": "G0416",
+      "condition": "prostate needle biopsy, saturation technique, 10 or more specimens from a single encounter"
+    }
+  ]
+}
