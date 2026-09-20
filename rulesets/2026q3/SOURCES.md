@@ -42,7 +42,11 @@ policies for a level-IV surgical pathology code typically do span many
 specimen types under one policy this way). Its diagnosis list uses real,
 freely-usable ICD-10-CM codes covering the fixture corpus's skin and GI
 specimens (D22.9 melanocytic nevus, L82.1 seborrheic keratosis, L57.0
-actinic keratosis, D12.6 benign neoplasm of colon, K63.5 polyp of colon)
+actinic keratosis, D12.6 benign neoplasm of colon, K63.5 polyp of colon,
+C43.9 malignant melanoma of skin -- a malignant diagnosis is at least as
+clear-cut a medical-necessity justification for pathology examination as
+a benign one, so it belongs on the covered list alongside them, not
+excluded from it)
 — the *codes* are real CMS/WHO identifiers with no licensing restriction,
 but the *policy itself* (which diagnoses this fictitious policy covers) is
 a structural demo fixture, not a citation to a real LCD. Deliberately

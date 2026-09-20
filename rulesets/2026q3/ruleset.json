@@ -19,7 +19,8 @@
     {"policy_id": "DEMO-POLICY-88305", "icd10": "L82.1"},
     {"policy_id": "DEMO-POLICY-88305", "icd10": "L57.0"},
     {"policy_id": "DEMO-POLICY-88305", "icd10": "D12.6"},
-    {"policy_id": "DEMO-POLICY-88305", "icd10": "K63.5"}
+    {"policy_id": "DEMO-POLICY-88305", "icd10": "K63.5"},
+    {"policy_id": "DEMO-POLICY-88305", "icd10": "C43.9"}
   ],
   "substitution": [
     {

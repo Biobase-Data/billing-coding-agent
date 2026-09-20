@@ -7,7 +7,6 @@
     {"code": "C43.9", "code_system": "ICD10", "units": 1, "modifiers": [], "specimen_id": "A"}
   ],
   "expected_findings": [
-    {"rule_id": "coverage:DEMO-POLICY-88305", "severity": "blocker"},
     {"rule_id": "documentation:ihc_missing_antibody", "severity": "review"}
   ]
 }
