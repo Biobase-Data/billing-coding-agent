@@ -1,11 +1,17 @@
-"""FastAPI app backing the local test UI. Two ways to exercise the
+"""FastAPI app backing the local test UI. Three ways to exercise the
 pipeline:
 
 - Sample corpus (`GET/POST /api/cases*`): the eval/cases/ fixtures,
   replayed through the real parsing/reconciliation code path with no
   API key required -- see eval/harness.py's ReplayClient.
-- Custom input (`POST /api/custom/run`): paste raw HL7v2 or FHIR text
-  and run it through a live model call. Requires ANTHROPIC_API_KEY.
+- Custom HL7v2/FHIR input (`POST /api/custom/run`): paste raw text and
+  run it through a live model call. Requires ANTHROPIC_API_KEY.
+- Custom PDF report (`POST /api/custom/pdf-run`): upload a signed-out
+  report PDF; text is extracted and section-split by
+  normalize/free_text.py. Specimens always come back Absent here (a
+  bare report has no structured accessioning specimen list), so
+  reconciliation is expected to report Blocked -- see that module's
+  docstring. Also requires ANTHROPIC_API_KEY.
 
 Coder actions (accept/edit/remove) recorded against a sample case are
 appended to `runs/coding_agent_actions/<case_id>.jsonl` -- gitignored,
@@ -16,10 +22,13 @@ from __future__ import annotations
 
 import json
 import os
+from datetime import date as date_cls
+from io import BytesIO
 from pathlib import Path
 from typing import Any, Literal
 
-from fastapi import FastAPI, HTTPException
+import pypdf
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -29,6 +38,7 @@ from coding_agent.audit.stamp import stamp
 from coding_agent.extract.specimens import AnthropicClient, extract_specimen_mentions
 from coding_agent.normalize.case import Case
 from coding_agent.normalize.fhir import FhirNormalizationError, parse_bundle
+from coding_agent.normalize.free_text import FreeTextNormalizationError, parse_report_text
 from coding_agent.normalize.hl7v2 import Hl7NormalizationError, parse_oru
 from coding_agent.recommend.assemble import build_recommendation
 from coding_agent.rules.units import RULES_VERSION
@@ -36,6 +46,11 @@ from eval.harness import load_corpus, run_eval_case
 
 STATIC_DIR = Path(__file__).with_name("static")
 ACTIONS_DIR = Path(__file__).resolve().parents[3] / "runs" / "coding_agent_actions"
+
+_NO_API_KEY_DETAIL = (
+    "ANTHROPIC_API_KEY is not set -- custom input requires a live model call. "
+    "Try a sample case instead, which runs offline."
+)
 
 app = FastAPI(title="coding_agent V0 test console")
 
@@ -131,26 +146,11 @@ class CustomRunRequest(BaseModel):
     primary_code: str
 
 
-@app.post("/api/custom/run")
-def run_custom(body: CustomRunRequest) -> dict[str, Any]:
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        raise HTTPException(
-            status_code=400,
-            detail="ANTHROPIC_API_KEY is not set -- custom input requires a live model call. "
-            "Try a sample case instead, which runs offline.",
-        )
-
-    try:
-        case: Case = (
-            parse_oru(body.raw_text)
-            if body.source_format == "hl7v2"
-            else parse_bundle(json.loads(body.raw_text))
-        )
-    except (Hl7NormalizationError, FhirNormalizationError, json.JSONDecodeError) as exc:
-        raise HTTPException(status_code=422, detail=f"could not normalize input: {exc}") from exc
-
+def _run_live_pipeline(case: Case, primary_code: str) -> dict[str, Any]:
+    """Shared tail of both custom-input endpoints: live extraction ->
+    bidirectional recommendation -> version stamp -> response dict."""
     extraction, _metrics = extract_specimen_mentions(case, client=AnthropicClient())
-    recommendation = build_recommendation(case, extraction, baseline=(), primary_code=body.primary_code)
+    recommendation = build_recommendation(case, extraction, baseline=(), primary_code=primary_code)
     audited = stamp(
         recommendation,
         extraction_metadata=extraction.metadata,
@@ -168,6 +168,64 @@ def run_custom(body: CustomRunRequest) -> dict[str, Any]:
         "recommendation": _dump(recommendation),
         "audited": _dump(audited),
     }
+
+
+@app.post("/api/custom/run")
+def run_custom(body: CustomRunRequest) -> dict[str, Any]:
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        raise HTTPException(status_code=400, detail=_NO_API_KEY_DETAIL)
+
+    try:
+        case: Case = (
+            parse_oru(body.raw_text)
+            if body.source_format == "hl7v2"
+            else parse_bundle(json.loads(body.raw_text))
+        )
+    except (Hl7NormalizationError, FhirNormalizationError, json.JSONDecodeError) as exc:
+        raise HTTPException(status_code=422, detail=f"could not normalize input: {exc}") from exc
+
+    return _run_live_pipeline(case, body.primary_code)
+
+
+def _extract_pdf_text(data: bytes) -> str:
+    reader = pypdf.PdfReader(BytesIO(data))
+    return "\n".join(page.extract_text() or "" for page in reader.pages)
+
+
+@app.post("/api/custom/pdf-run")
+async def run_custom_pdf(
+    file: UploadFile = File(...),
+    accession_number: str = Form(...),
+    date_of_service: str = Form(...),
+    primary_code: str = Form(...),
+) -> dict[str, Any]:
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        raise HTTPException(status_code=400, detail=_NO_API_KEY_DETAIL)
+
+    try:
+        service_date = date_cls.fromisoformat(date_of_service)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=422, detail=f"date_of_service must be YYYY-MM-DD: {exc}"
+        ) from exc
+
+    pdf_bytes = await file.read()
+    try:
+        raw_text = _extract_pdf_text(pdf_bytes)
+    except pypdf.errors.PyPdfError as exc:
+        raise HTTPException(status_code=422, detail=f"could not read PDF: {exc}") from exc
+
+    try:
+        case = parse_report_text(
+            raw_text,
+            case_id=accession_number,
+            accession_number=accession_number,
+            date_of_service=service_date,
+        )
+    except FreeTextNormalizationError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    return _run_live_pipeline(case, primary_code)
 
 
 @app.get("/")

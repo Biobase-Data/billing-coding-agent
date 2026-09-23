@@ -83,7 +83,7 @@ PYTHONPATH=src:. uvicorn coding_agent.api.app:app --reload --port 8010
 # open http://localhost:8010
 ```
 
-It gives you two ways to try it:
+It gives you three ways to try it:
 
 - **Sample corpus** — the `eval/cases/` fixtures, run through the real
   normalize/extract/rules/recommend/audit code path with a *recorded*
@@ -91,10 +91,19 @@ It gives you two ways to try it:
   **no API key**. Pick a case, click "Run pipeline", see the
   recommendation lines and accept/edit/remove them (recorded to
   `runs/coding_agent_actions/<case_id>.jsonl`, gitignored).
-- **Custom input** — paste your own HL7v2 message or FHIR R4 Bundle JSON
-  and run it through a **live** model call; requires
+- **Custom HL7v2/FHIR input** — paste your own HL7v2 message or FHIR R4
+  Bundle JSON and run it through a **live** model call; requires
   `ANTHROPIC_API_KEY` in the environment the server runs in, and returns
   a clear 400 without one rather than silently falling back to anything.
+- **Custom PDF report** — upload a signed-out surgical pathology report
+  PDF directly (`normalize/free_text.py` extracts text via `pypdf` and
+  splits it into narrative sections by header keyword: Clinical History /
+  Gross Description / Microscopic Description / Diagnosis). A bare PDF
+  has no structured accessioning specimen list the way an HL7/FHIR feed
+  does, so `Case.specimens` always comes back `Absent` here and
+  reconciliation correctly reports **Blocked** rather than inventing a
+  specimen count from the narrative — you'll still see what labels the
+  narrative itself names. Also requires `ANTHROPIC_API_KEY`.
 
 This is a hand-testing console, not a production review service — see
 `pipeline/api/` for that pattern applied to the older demo build.

@@ -1,6 +1,7 @@
 """Tests for src/coding_agent/api/app.py: the local-only test console
-backend. Sample-corpus endpoints run offline; the custom-input endpoint
-is tested only for its "no API key" guard, not against a live model."""
+backend. Sample-corpus endpoints run offline; the custom-input and
+custom-PDF endpoints are tested for their parsing/validation paths and
+their "no API key" guard, never against a live model."""
 
 from __future__ import annotations
 
@@ -9,10 +10,35 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
+from fpdf import FPDF
 
 from coding_agent.api.app import ACTIONS_DIR, app
 
 client = TestClient(app)
+
+
+def _pdf_bytes(lines: list[str]) -> bytes:
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Helvetica", size=11)
+    for line in lines:
+        pdf.cell(0, 6, text=line, new_x="LMARGIN", new_y="NEXT")
+    return bytes(pdf.output())
+
+
+REPORT_PDF_LINES = [
+    "SYNTHETIC PATHOLOGY ASSOCIATES",
+    "Accession #: S26-0099001",
+    "CLINICAL HISTORY:",
+    "Rash on bilateral upper extremities.",
+    "GROSS DESCRIPTION:",
+    "Received in formalin, two specimens labeled A and B.",
+    "MICROSCOPIC DESCRIPTION:",
+    "Sections show compound melanocytic proliferation.",
+    "DIAGNOSIS:",
+    "A. Skin, left forearm: compound nevus.",
+    "B. Skin, right shoulder: compound nevus.",
+]
 
 
 @pytest.fixture(autouse=True)
@@ -106,3 +132,47 @@ def test_custom_run_without_api_key_is_rejected(monkeypatch):
     )
     assert resp.status_code == 400
     assert "ANTHROPIC_API_KEY" in resp.json()["detail"]
+
+
+def test_pdf_run_without_api_key_is_rejected(monkeypatch):
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    resp = client.post(
+        "/api/custom/pdf-run",
+        files={"file": ("report.pdf", _pdf_bytes(REPORT_PDF_LINES), "application/pdf")},
+        data={"accession_number": "S26-0099001", "date_of_service": "2026-01-20", "primary_code": "88305"},
+    )
+    assert resp.status_code == 400
+    assert "ANTHROPIC_API_KEY" in resp.json()["detail"]
+
+
+def test_pdf_run_rejects_bad_date_format(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key-parsing-path-only-not-real")
+    resp = client.post(
+        "/api/custom/pdf-run",
+        files={"file": ("report.pdf", _pdf_bytes(REPORT_PDF_LINES), "application/pdf")},
+        data={"accession_number": "S26-0099001", "date_of_service": "not-a-date", "primary_code": "88305"},
+    )
+    assert resp.status_code == 422
+    assert "date_of_service" in resp.json()["detail"]
+
+
+def test_pdf_run_rejects_non_pdf_bytes(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key-parsing-path-only-not-real")
+    resp = client.post(
+        "/api/custom/pdf-run",
+        files={"file": ("report.pdf", b"this is not a pdf at all", "application/pdf")},
+        data={"accession_number": "S26-0099001", "date_of_service": "2026-01-20", "primary_code": "88305"},
+    )
+    assert resp.status_code == 422
+    assert "could not read PDF" in resp.json()["detail"]
+
+
+def test_pdf_run_rejects_text_with_no_recognized_sections(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key-parsing-path-only-not-real")
+    resp = client.post(
+        "/api/custom/pdf-run",
+        files={"file": ("report.pdf", _pdf_bytes(["just some unrelated text"]), "application/pdf")},
+        data={"accession_number": "S26-0099001", "date_of_service": "2026-01-20", "primary_code": "88305"},
+    )
+    assert resp.status_code == 422
+    assert "no recognized section" in resp.json()["detail"]

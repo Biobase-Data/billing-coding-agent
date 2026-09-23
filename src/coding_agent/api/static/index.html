@@ -76,6 +76,7 @@
     <div id="case-list"></div>
     <h2>Custom input</h2>
     <button class="case-btn" id="custom-btn">Paste HL7 / FHIR text</button>
+    <button class="case-btn" id="pdf-btn">Upload PDF report</button>
   </nav>
   <main id="main">
     <p class="empty">Pick a case on the left.</p>
@@ -122,6 +123,13 @@ document.getElementById('custom-btn').addEventListener('click', () => {
   state.mode = 'custom';
   state.selected = null;
   renderCustomForm();
+  loadCases();
+});
+
+document.getElementById('pdf-btn').addEventListener('click', () => {
+  state.mode = 'pdf';
+  state.selected = null;
+  renderPdfForm();
   loadCases();
 });
 
@@ -283,6 +291,61 @@ function renderCustomForm() {
           primary_code: codeInput.value,
         }),
       });
+      resultHolder.appendChild(specimensCard(r.case));
+      resultHolder.appendChild(narrativeCard(r.case));
+      resultHolder.appendChild(recommendationCard(r, null));
+    } catch (e) {
+      resultHolder.appendChild(el('p', { class: 'error' }, [e.message]));
+    }
+    runBtn.disabled = false;
+    runBtn.textContent = 'Run (requires ANTHROPIC_API_KEY)';
+  });
+
+  main.appendChild(card);
+  main.appendChild(el('div', { class: 'row' }, [runBtn]));
+  main.appendChild(resultHolder);
+}
+
+function renderPdfForm() {
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  const card = el('div', { class: 'card' }, [
+    el('h3', {}, ['Upload signed-out report PDF (live model call)']),
+    el('p', { class: 'empty' }, [
+      'A bare PDF has no structured accessioning specimen list, so reconciliation ',
+      'will report "blocked" here — this is expected, not an error. You will still ',
+      'see what specimen labels the narrative itself names.',
+    ]),
+  ]);
+
+  const fileInput = el('input', { type: 'file', accept: 'application/pdf' });
+  const accessionInput = el('input', { type: 'text', placeholder: 'accession number, e.g. S26-0099001' });
+  const dateInput = el('input', { type: 'date' });
+  const codeInput = el('input', { type: 'text', placeholder: 'primary code, e.g. 88305', value: '88305' });
+
+  card.appendChild(el('div', { class: 'row' }, [fileInput]));
+  card.appendChild(el('div', { class: 'row' }, [accessionInput, dateInput, codeInput]));
+
+  const runBtn = el('button', { class: 'run' }, ['Run (requires ANTHROPIC_API_KEY)']);
+  const resultHolder = el('div', {});
+  runBtn.addEventListener('click', async () => {
+    if (!fileInput.files[0]) { alert('Choose a PDF file first.'); return; }
+    if (!accessionInput.value || !dateInput.value) { alert('Accession number and date of service are required.'); return; }
+
+    runBtn.disabled = true;
+    runBtn.textContent = 'Running…';
+    resultHolder.innerHTML = '';
+    try {
+      const form = new FormData();
+      form.append('file', fileInput.files[0]);
+      form.append('accession_number', accessionInput.value);
+      form.append('date_of_service', dateInput.value);
+      form.append('primary_code', codeInput.value);
+
+      const res = await fetch('/api/custom/pdf-run', { method: 'POST', body: form });
+      const r = await res.json();
+      if (!res.ok) throw new Error(r.detail || res.statusText);
+
       resultHolder.appendChild(specimensCard(r.case));
       resultHolder.appendChild(narrativeCard(r.case));
       resultHolder.appendChild(recommendationCard(r, null));

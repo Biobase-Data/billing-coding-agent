@@ -134,3 +134,26 @@ above:
    `run_eval_case` is the closest thing to that wiring today, and is
    deliberately eval-only (it takes a recorded model response, not a
    live `ModelClient`, by default).
+
+6. **Free-text/PDF reports always have `specimens` absent.**
+   `normalize/free_text.py` (added for the local test console's PDF
+   upload path) never sets `Case.specimens` to anything but
+   `Maybe.missing(Absent.NOT_SUPPLIED)` — a bare report PDF has no
+   structured accessioning specimen list the way an HL7/FHIR feed does,
+   and V0's own rule (`Specimen`'s docstring in `normalize/case.py`) is
+   that this list is never derived by reading the narrative. This means
+   a PDF-only input always reconciles to `Blocked` — correct behavior,
+   not a bug, but it does mean the PDF path is only useful for seeing
+   what the narrative claims, not for a real reconciliation, until it's
+   paired with an actual LIS specimen list some other way.
+
+7. **Section-splitting is a header-keyword heuristic.** Unlike the HL7/
+   FHIR parsers (which read a structured field for section identity —
+   OBX-3, `Observation.code`), `free_text.py` recognizes section
+   boundaries only by matching a line against a fixed vocabulary of
+   header spellings (`_HEADER_TO_NARRATIVE_KIND`). A report using an
+   unrecognized heading degrades that section to `Absent.NOT_SUPPLIED`
+   rather than guessing; it does not raise, unless *no* section is
+   recognized at all. `case_id`/`accession_number`/`date_of_service` are
+   never inferred from the report text — the caller (the UI form) must
+   supply them, for the same guess-vs-abstain reason.
