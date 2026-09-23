@@ -1,4 +1,85 @@
-# Billing and coding agent — demo build
+# Billing and coding agent
+
+This repo holds two builds, in sequence:
+
+- **`src/coding_agent/` — the V0 pathology billing & coding agent** (current
+  focus). A stricter, from-scratch architecture: a canonical `Case` object
+  with explicit absence semantics, a hard-enforced `extract/` ↔ `rules/`
+  layer boundary, bidirectional-always recommendations (every code path
+  that can add a unit can also flag one for removal), first-class
+  abstention, and full version stamping on every output. V0's scope is
+  narrow and deliberate: **specimen unit reconciliation, offline/
+  retrospective** — reconciling the narrative's specimen labels against
+  the accessioning record's specimen list, nothing more. See "V0:
+  `src/coding_agent/`" below.
+- **`pipeline/` — the earlier demo build** (described in the rest of this
+  file). A broader, phase-built pipeline (extraction → deterministic
+  mapping → validation → coder review UI → evaluation) covering CPT
+  leveling and ICD-10 diagnosis mapping, not just unit reconciliation.
+  Still present, still tested, but superseded as the active build — new
+  work happens in `src/coding_agent/`.
+
+Both run on synthetic data and are not production-hardened. **Read
+`ASSUMPTIONS.md` first** — it records every judgment call and open
+decision either build made without a commercial AP coder's sign-off, and
+every place those calls are encoded in the code.
+
+## V0: `src/coding_agent/`
+
+```
+src/coding_agent/
+  normalize/   canonical Case object; HL7v2 ORU^R01 and FHIR R4 -> Case
+  extract/     probabilistic layer -- facts + evidence spans only, never
+               a billing code. specimens.py: find every specimen label
+               the narrative names, or abstain.
+  rules/       deterministic layer -- units.py: reconcile the narrative's
+               specimen labels against the accessioning record's list.
+               Pure functions, table-driven, versioned.
+  recommend/   assembles rules/ + extract/ output into a bidirectional
+               diff: every call computes both addition and removal
+               candidates together, never one direction only.
+  audit/       version-stamps every recommendation (model, prompt, rules,
+               code-set year) and the append-only coder action log.
+eval/          corpus harness, metrics (label precision/recall, F1,
+               abstention rate), and a run-to-run repeatability check.
+               eval/cases/*.json are self-contained fixtures: a Case, a
+               recorded model response, and expected ground truth --
+               the corpus runs offline, no API key required.
+tools/
+  corpus_inventory.py   normalize/-layer diagnostic: given a directory of
+                        raw HL7/FHIR exports, reports which cases can
+                        even supply a structured specimen list to
+                        reconcile against, before any extraction runs.
+tests/         test_case.py, test_normalize.py, test_extract_specimens.py,
+               test_rules_units.py, test_recommend.py, test_audit.py,
+               test_eval.py, test_corpus_inventory.py, and
+               test_layer_boundary.py -- an AST-based static check (with
+               a self-verifying meta-test) that extract/ and rules/
+               never import each other.
+```
+
+`extract/` never imports `rules/`, and `rules/` never imports `extract/`
+— this is enforced by `tests/test_layer_boundary.py`, not just convention.
+A `RecommendationLine` of kind `ADDITION` must carry evidence; one of kind
+`REMOVAL` must not (its finding *is* the absence of narrative support) —
+enforced by a pydantic validator in `recommend/schema.py`.
+
+Run just this build's tests:
+
+```bash
+source .venv/bin/activate
+pytest tests/ -q
+python -m tools.corpus_inventory tests/fixtures/hl7v2 tests/fixtures/fhir --json
+```
+
+There is no CLI wiring together normalize → extract → rules → recommend →
+audit into one end-to-end command yet (each layer is exercised directly by
+its own tests and by `eval/harness.py`); see `ASSUMPTIONS.md` for what
+else V0 has deliberately deferred.
+
+---
+
+## `pipeline/` — the earlier demo build
 
 An end-to-end pipeline that takes a finalized surgical pathology report
 plus a lab's procedure records, produces a reconciled code set with
@@ -8,9 +89,6 @@ accepts, edits, or removes — with every decision logged and an
 evaluation harness scoring the output against ground truth.
 
 Runs on synthetic data (`fixtures/`) and is not production-hardened.
-**Read `ASSUMPTIONS.md` first** — it records every judgment call and
-open decision this build made without a commercial AP coder's sign-off,
-and every place those calls are encoded in the code.
 
 ## The one principle
 
@@ -81,12 +159,16 @@ ui/           React + TypeScript review interface (Queue, Case Review, Decision 
 
 ## Testing
 
-`pytest -q` runs everything: model/contract tests, the mapper and
-validator's per-rule unit tests (positive/negative/boundary), golden
-tests across the corpus, determinism tests, the rule-version-replay
+`pytest -q` from the repo root runs both builds' suites together (V0's
+`tests/` plus `pipeline/`'s own tests, per `pyproject.toml`'s
+`testpaths`). For `pipeline/` specifically: model/contract tests, the
+mapper and validator's per-rule unit tests (positive/negative/boundary),
+golden tests across the corpus, determinism tests, the rule-version-replay
 test, the review API's contract tests, and the repo-wide CPT-descriptor
 guard. Repeatability (extraction called live, N=20) skips itself without
-`ANTHROPIC_API_KEY` — see `pipeline/eval/test_repeatability.py`.
+`ANTHROPIC_API_KEY` — see `pipeline/eval/test_repeatability.py`. V0 has
+its own offline repeatability check (`eval/repeatability.py`) that runs
+against any `ModelClient`, including a live one when a key is available.
 
 CI (`.github/workflows/ci.yml`) runs the suite plus `pipeline.cli.eval`
 and uploads the report as a build artifact.
@@ -97,4 +179,7 @@ Claim construction/submission, denial management, EHR integration, real
 patient data, auth/multi-tenancy, live LIS connectivity, CPT descriptor
 text (AMA-licensed — see ASSUMPTIONS.md), and UI component tests (the
 API contract is tested; the screens are expected to change once a coder
-has used them).
+has used them). This section describes `pipeline/`; V0's own scope
+boundary is the "specimen unit reconciliation, offline/retrospective"
+line above — CPT/ICD-10 leveling, live/streaming ingestion, and a coder
+review UI for V0's output are all out of scope for this iteration.

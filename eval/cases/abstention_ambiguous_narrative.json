@@ -1,0 +1,26 @@
+{
+  "case": {
+    "case_id": "eval-abstain-ambiguous-001",
+    "accession_number": "S26-1005",
+    "date_of_service": "2026-03-13",
+    "source_format": "hl7v2",
+    "source_document_id": "S26-1005",
+    "specimens": {
+      "value": [
+        {"specimen_id": "A", "source_field": "SPM"},
+        {"specimen_id": "B", "source_field": "SPM"}
+      ]
+    },
+    "narrative": [
+      {
+        "kind": "gross",
+        "text": {"value": "Two specimens received; the container labels do not agree with the requisition, and it is unclear whether the second container corresponds to specimen B or specimen C."}
+      }
+    ],
+    "requisition": {"match_method": "accession_number"}
+  },
+  "model_response_text": "{\"abstain\": true, \"reason\": \"ambiguous_narrative\", \"detail\": \"labeling scheme is inconsistent between the requisition and the container labels\", \"mentions\": []}",
+  "expected_labels": null,
+  "primary_code": "88305",
+  "baseline": []
+}

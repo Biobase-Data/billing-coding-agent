@@ -1,0 +1,20 @@
+{
+  "case": {
+    "case_id": "eval-abstain-no-narrative-001",
+    "accession_number": "S26-1004",
+    "date_of_service": "2026-03-11",
+    "source_format": "hl7v2",
+    "source_document_id": "S26-1004",
+    "specimens": {
+      "value": [
+        {"specimen_id": "A", "source_field": "SPM"}
+      ]
+    },
+    "narrative": [],
+    "requisition": {"match_method": "accession_number"}
+  },
+  "model_response_text": "",
+  "expected_labels": null,
+  "primary_code": "88305",
+  "baseline": []
+}

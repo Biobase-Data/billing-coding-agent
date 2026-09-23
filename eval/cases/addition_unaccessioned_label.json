@@ -1,0 +1,29 @@
+{
+  "case": {
+    "case_id": "eval-addition-001",
+    "accession_number": "S26-1003",
+    "date_of_service": "2026-03-08",
+    "source_format": "hl7v2",
+    "source_document_id": "S26-1003",
+    "specimens": {
+      "value": [
+        {"specimen_id": "A", "source_field": "SPM"}
+      ]
+    },
+    "narrative": [
+      {
+        "kind": "gross",
+        "text": {"value": "Received in formalin, one specimen labeled A, along with an additional fragment later designated D by the pathologist during grossing."}
+      },
+      {
+        "kind": "diagnosis",
+        "text": {"value": "A. Skin, left forearm: compound nevus.\nD. Skin, right shoulder: compound nevus."}
+      }
+    ],
+    "requisition": {"match_method": "accession_number"}
+  },
+  "model_response_text": "{\"abstain\": false, \"mentions\": [{\"label\": \"A\", \"section\": \"diagnosis\", \"quoted\": \"A. Skin, left forearm\"}, {\"label\": \"D\", \"section\": \"diagnosis\", \"quoted\": \"D. Skin, right shoulder\"}]}",
+  "expected_labels": ["A", "D"],
+  "primary_code": "88305",
+  "baseline": []
+}

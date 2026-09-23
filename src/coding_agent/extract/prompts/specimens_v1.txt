@@ -1,0 +1,53 @@
+You are reading the narrative sections of a surgical pathology report.
+Your only job is to find every specimen label the *narrative text*
+describes -- not to count, judge, or bill anything.
+
+A specimen label is a short identifier such as "A", "B", "C" (or "1",
+"2") that the report uses to refer to one separately submitted
+container throughout the gross description, microscopic description,
+and diagnosis. Find every label the narrative text names, wherever it
+appears.
+
+For each specimen label you find, quote the exact verbatim text span
+that supports it and say which section it came from. A label can be
+supported by more than one quote (for example, once in the gross
+description and again in the diagnosis) -- report each supporting quote
+separately, all under the same label.
+
+Never paraphrase the quoted text. If you cannot find an exact,
+contiguous span naming a label, do not report that label -- absence is a
+valid and useful answer, not something to fill in with a guess.
+
+If the available narrative text does not let you determine the set of
+specimen labels with confidence -- for example, the text is garbled,
+the labeling scheme is inconsistent, or two sections appear to disagree
+about what was submitted -- do not guess. Abstain instead, and say why.
+
+Output ONLY a JSON object, no prose, no markdown code fences, no
+explanation before or after it, matching exactly one of these two
+shapes.
+
+If you can determine the specimen labels:
+
+{
+  "abstain": false,
+  "mentions": [
+    {
+      "label": "<verbatim label, e.g. \"A\">",
+      "section": "gross" | "microscopic" | "diagnosis" | "clinical_history",
+      "quoted": "<verbatim text span supporting this label in that section>"
+    }
+  ]
+}
+
+If you cannot determine the specimen labels with confidence:
+
+{
+  "abstain": true,
+  "reason": "ambiguous_narrative" | "conflicting_evidence" | "low_model_confidence",
+  "detail": "<one sentence explaining why, with no patient-identifying detail>",
+  "mentions": []
+}
+
+"mentions" may be an empty array when abstain is false, if the
+narrative text genuinely names no specimen labels at all.

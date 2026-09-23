@@ -18,11 +18,13 @@ dev = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["pipeline*"]
+where = [".", "src"]
+include = ["pipeline*", "coding_agent*"]
 
 [build-system]
 requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
-testpaths = ["pipeline"]
+testpaths = ["pipeline", "tests"]
+pythonpath = ["src", "."]

@@ -85,3 +85,52 @@ these guesses points back here with a comment.
   anyway per the phase sequence in the spec, since the task specifies all six
   phases; flagging here that Phase 5 is the one most likely to be reworked
   once a coder has used it.
+
+## V0 (`src/coding_agent/`) — interim assumptions
+
+This build is newer and narrower in scope than `pipeline/` above (see
+README.md); its own open decisions, distinct from the judgment calls
+above:
+
+1. **One uniform per-specimen code per case.** `recommend/assemble.py`
+   takes a single externally-supplied `primary_code` and only ever
+   proposes specimen-level ADDITION/REMOVAL flags against it
+   (`recommend/schema.py`'s module docstring). A lab that bills different
+   code levels per specimen based on complexity needs a follow-on
+   capability this package does not yet have — V0 assumes the common
+   case for routine biopsy volume, where one code level applies
+   uniformly across a case's specimens.
+
+2. **Requisition matching is always `ACCESSION_NUMBER`.** Both
+   normalizers (`normalize/hl7v2.py`, `normalize/fhir.py`) read the
+   clinical indication and ordering provider from the same message/
+   bundle that carries the specimens, so the resulting `Requisition` is
+   always exact-identifier-matched by construction. `FUZZY_NAME_DOB`
+   exists on `RequisitionMatchMethod` and is tested
+   (`tests/test_case.py`), but nothing produces it yet — V0 has no
+   separate paper-requisition ingestion path that would need a fuzzy
+   name/DOB match. Adding one means a real matching step that sets
+   `match_confidence` honestly, not extending either normalizer to guess
+   a fuzzy match from a single message.
+
+3. **HL7 v2 parser limitations.** Assumes standard encoding characters
+   from MSH-1/MSH-2 (a non-standard-delimiter feed is a per-LIS
+   integration detail to handle upstream). HL7 escape sequences (`\F\`,
+   `\.br\`, ...) inside field text are not decoded — a feed relying on
+   them will produce narrative text containing the raw escape sequence.
+   No PHI (PID name/DOB) is ever read into the canonical `Case`.
+
+4. **FHIR R4 parser limitations.** Assumes exactly one `DiagnosticReport`
+   per bundle; a bundle with more than one is out of scope, split it
+   upstream. Only `Observation.valueString` is read for narrative text —
+   `valueCodeableConcept` or `component[]`-based narrative observations
+   are not supported yet. No PHI (`Patient` resource fields) is read into
+   the canonical `Case`.
+
+5. **No end-to-end CLI yet.** Each layer (`normalize/` → `extract/` →
+   `rules/` → `recommend/` → `audit/`) is exercised directly by its own
+   tests and by `eval/harness.py`, but nothing wires them into one
+   command a lab could point at a live HL7/FHIR feed. `eval/harness.py`'s
+   `run_eval_case` is the closest thing to that wiring today, and is
+   deliberately eval-only (it takes a recorded model response, not a
+   live `ModelClient`, by default).
