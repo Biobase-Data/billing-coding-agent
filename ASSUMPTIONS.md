@@ -157,3 +157,19 @@ above:
    recognized at all. `case_id`/`accession_number`/`date_of_service` are
    never inferred from the report text — the caller (the UI form) must
    supply them, for the same guess-vs-abstain reason.
+
+   A real PDF's flattened text also has no marker for where a section
+   *ends* except the next recognized header, so signature blocks, CLIA
+   numbers, and standard FDA/CLIA legal disclaimer boilerplate land
+   inside whichever section is still open — found via a real redacted
+   report where a cover-page disclaimer, a CPT/ICD signature line, and
+   a wall of lab-legal text all ended up inside `CLINICAL_HISTORY`/
+   `GROSS`. `_is_boilerplate_line` / `_END_OF_REPORT_LINE` strip a
+   narrow, high-precision allowlist of such patterns (chosen to be
+   generic US-clinical-lab boilerplate, not overfit to that one report)
+   before the text reaches the model, because this narrative feeds a
+   coder-facing recommendation and noise there is a real quality
+   problem. It is not exhaustive: a facility-name/provider-code
+   fragment with no matching pattern can still survive into a section,
+   and a report using different disclaimer wording than the patterns
+   here will pass its own boilerplate through untouched.

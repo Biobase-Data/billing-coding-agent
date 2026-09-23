@@ -60,9 +60,12 @@ def test_split_sections_ignores_letterhead_before_first_header():
         assert "Patient: TEST" not in text
 
 
-def test_split_sections_folds_trailing_signature_into_last_open_section():
+def test_split_sections_strips_trailing_signature_boilerplate():
     sections = split_sections(REPORT)
-    assert "Electronically signed by Jane Smith, MD" in sections[NarrativeKind.DIAGNOSIS]
+    assert "Electronically signed by Jane Smith, MD" not in sections[NarrativeKind.DIAGNOSIS]
+    assert sections[NarrativeKind.DIAGNOSIS] == (
+        "A. Skin, left forearm: compound nevus.\nB. Skin, right shoulder: compound nevus."
+    )
 
 
 def test_split_sections_alternate_header_spellings():
@@ -113,3 +116,70 @@ def test_parse_report_text_rejects_text_with_no_recognized_sections():
             accession_number="S26-0099003",
             date_of_service=date(2026, 1, 20),
         )
+
+
+# A reconstruction of a real messy PDF's flattened text (disclaimer banner,
+# CPT/ICD signature line, lab CLIA/legal boilerplate, an end-of-report
+# marker, and trailing page/table artifacts) -- regression coverage for
+# the boilerplate-stripping this module does before handing narrative
+# text to the model.
+MESSY_REAL_WORLD_REPORT = """\
+CLINICAL HISTORY
+***Please disregard this page! This is NOT the official report. Proceed to next page to view report. ***NG
+Left shoulder mass.
+GROSS DESCRIPTION
+Received in formalin labeled "left shoulder mass" is a 13.5 x 9.5 x 5.5 cm piece of tissue.
+ELECTRONIC SIGNATURE CPT CODE(S): ICD10 CODE(S):
+Regional Pathology Associates 88304(1)
+Screening Location:2701 Hospital Drive, Victoria, TX 77901
+Note: The CPT codes provided are for information purposes only and are based on AMA Guidelines.
+One or more analyte specific reagents may have been used to evaluate this case.
+This test has not been cleared by the FDA and should not be regarded as investigational or for research.
+This laboratory is certified under the Clinical Improvement Amendments of 1988 (CLIA) as qualified to
+perform high complexity clinical laboratory testing.
+Specimens Processed by Gastroenterology & Liver Associates PLLC. CLIA # 45D2020900 Ph: 713.783.4252
+*** END OF REPORT ****
+Page 1 of 1
+2019
+2019
+MICROSCOPIC DESCRIPTION:
+Microscopic examination was performed. The findings are included in the diagnosis rendered.
+DIAGNOSIS:
+Skin, left shoulder: lipoma.
+"""
+
+
+def test_split_sections_strips_disclaimer_banner():
+    sections = split_sections(MESSY_REAL_WORLD_REPORT)
+    assert "disregard this page" not in sections[NarrativeKind.CLINICAL_HISTORY].lower()
+    assert sections[NarrativeKind.CLINICAL_HISTORY] == "Left shoulder mass."
+
+
+def test_split_sections_strips_signature_and_lab_legal_boilerplate():
+    sections = split_sections(MESSY_REAL_WORLD_REPORT)
+    gross = sections[NarrativeKind.GROSS]
+    for noise in (
+        "CPT CODE(S)",
+        "Screening Location",
+        "information purposes only",
+        "analyte specific reagent",
+        "cleared by the FDA",
+        "Clinical Improvement Amendments",
+        "high complexity clinical laboratory testing",
+        "Specimens Processed by",
+        "CLIA #",
+    ):
+        assert noise not in gross
+
+
+def test_split_sections_discards_everything_after_end_of_report_marker():
+    sections = split_sections(MESSY_REAL_WORLD_REPORT)
+    assert "diagnosis rendered" in sections[NarrativeKind.MICROSCOPIC]
+    for section_text in sections.values():
+        assert "Page 1 of 1" not in section_text
+        assert "2019" not in section_text
+
+
+def test_split_sections_keeps_genuine_diagnosis_text_after_all_the_noise():
+    sections = split_sections(MESSY_REAL_WORLD_REPORT)
+    assert sections[NarrativeKind.DIAGNOSIS] == "Skin, left shoulder: lipoma."

@@ -19,6 +19,19 @@ heading, and degrades that section to `Absent.NOT_SUPPLIED` rather than
 guessing. `case_id`, `accession_number`, and `date_of_service` are not
 inferred from the report text (the same guess-vs-abstain posture): the
 caller must supply them.
+
+A real PDF's flattened text commonly interleaves non-clinical content
+into whatever section happens to be open -- signature blocks, CLIA
+numbers, "for information purposes only" legal boilerplate, page-number
+footers -- because there is nothing in plain text marking where a
+section actually *ends* except the next recognized header.
+`_is_boilerplate_line` strips a narrow, high-precision allowlist of such
+patterns before they reach the model; it is deliberately conservative
+(a missed pattern degrades to noise in the narrative, not a wrong
+clinical claim) rather than an attempt at fully general cleanup. This
+matters because that narrative text feeds a coder-facing recommendation
+downstream, and noise there is a real quality problem, not merely
+cosmetic.
 """
 
 from __future__ import annotations
@@ -62,6 +75,47 @@ _HEADER_LINE = re.compile(
     re.IGNORECASE,
 )
 
+# Signature blocks, billing/legal boilerplate, and footer artifacts that
+# commonly land inside a still-open section when a PDF's text is
+# flattened -- see the module docstring. Matched anywhere in the line
+# (not anchored) except where noted, and the whole line is dropped, not
+# just the matched portion.
+_BOILERPLATE_LINE_PATTERNS = [
+    re.compile(pattern, re.IGNORECASE)
+    for pattern in (
+        r"electronically signed",
+        r"please disregard this page",
+        r"proceed to next page",
+        r"cpt code\(s\)\s*:",
+        r"icd-?10 code\(s\)\s*:",
+        r"^page\s+\d+\s+of\s+\d+\s*$",
+        r"clia\s*#",
+        r"screening location\s*:",
+        r"cpt codes provided are for information purposes only",
+        r"illustrative purposes only",
+        r"analyte specific reagent",
+        r"cleared by the fda",
+        r"regarded as investigational",
+        r"clinical improvement amendments",
+        r"high complexity clinical laboratory testing",
+        r"specimens processed by",
+        r"^ph:?\s*\d{3}[.\-]\d{3}[.\-]\d{4}",
+        r"^\d{4}$",  # a bare 4-digit year with nothing else -- a page/table
+        # extraction artifact; real narrative sentences never consist of
+        # just a year.
+    )
+]
+
+# An explicit end-of-document marker: everything after it (signature
+# blocks, footers, page furniture) is discarded outright by closing
+# whichever section is open, rather than relying on catching every
+# individual boilerplate pattern that might follow it.
+_END_OF_REPORT_LINE = re.compile(r"end of report", re.IGNORECASE)
+
+
+def _is_boilerplate_line(line: str) -> bool:
+    return any(pattern.search(line) for pattern in _BOILERPLATE_LINE_PATTERNS)
+
 
 class FreeTextNormalizationError(Exception):
     """Raised when the report text carries no recognizable content at
@@ -77,7 +131,9 @@ def split_sections(raw_text: str) -> dict[NarrativeKind, str]:
     demographics/letterhead this module never reads). A recognized
     header with no following text before the next header contributes no
     section. Unrecognized headers are folded into whichever section is
-    currently open.
+    currently open. A line matching a known boilerplate pattern, or an
+    explicit end-of-report marker, is dropped rather than appended --
+    see the module docstring.
     """
     sections: dict[NarrativeKind, list[str]] = {}
     current: NarrativeKind | None = None
@@ -88,7 +144,10 @@ def split_sections(raw_text: str) -> dict[NarrativeKind, str]:
             current = _HEADER_TO_NARRATIVE_KIND[match.group(1).upper()]
             sections.setdefault(current, [])
             continue
-        if current is not None and line.strip():
+        if _END_OF_REPORT_LINE.search(line):
+            current = None
+            continue
+        if current is not None and line.strip() and not _is_boilerplate_line(line):
             sections[current].append(line.strip())
 
     return {kind: "\n".join(lines) for kind, lines in sections.items() if lines}
