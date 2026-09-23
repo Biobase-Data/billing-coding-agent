@@ -72,10 +72,36 @@ pytest tests/ -q
 python -m tools.corpus_inventory tests/fixtures/hl7v2 tests/fixtures/fhir --json
 ```
 
-There is no CLI wiring together normalize → extract → rules → recommend →
-audit into one end-to-end command yet (each layer is exercised directly by
-its own tests and by `eval/harness.py`); see `ASSUMPTIONS.md` for what
-else V0 has deliberately deferred.
+### Local test console (`src/coding_agent/api/`)
+
+A small FastAPI service + single-page vanilla-JS UI for exercising the
+pipeline by hand, no build step required:
+
+```bash
+source .venv/bin/activate
+PYTHONPATH=src:. uvicorn coding_agent.api.app:app --reload --port 8010
+# open http://localhost:8010
+```
+
+It gives you two ways to try it:
+
+- **Sample corpus** — the `eval/cases/` fixtures, run through the real
+  normalize/extract/rules/recommend/audit code path with a *recorded*
+  model response (`eval/harness.py`'s `ReplayClient`), so it works with
+  **no API key**. Pick a case, click "Run pipeline", see the
+  recommendation lines and accept/edit/remove them (recorded to
+  `runs/coding_agent_actions/<case_id>.jsonl`, gitignored).
+- **Custom input** — paste your own HL7v2 message or FHIR R4 Bundle JSON
+  and run it through a **live** model call; requires
+  `ANTHROPIC_API_KEY` in the environment the server runs in, and returns
+  a clear 400 without one rather than silently falling back to anything.
+
+This is a hand-testing console, not a production review service — see
+`pipeline/api/` for that pattern applied to the older demo build.
+
+There is no CLI wiring the layers together outside of the API/eval
+harness yet; see `ASSUMPTIONS.md` for what else V0 has deliberately
+deferred.
 
 ---
 
