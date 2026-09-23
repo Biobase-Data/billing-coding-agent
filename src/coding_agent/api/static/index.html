@@ -86,10 +86,23 @@
 <script>
 const state = { cases: [], selected: null, mode: null };
 
+function errorMessage(body, fallback) {
+  const detail = body && body.detail;
+  if (typeof detail === 'string' && detail) return detail;
+  if (Array.isArray(detail)) {
+    // FastAPI's own request validation (e.g. a missing required field)
+    // returns `detail` as a list of {loc, msg} objects, not a string.
+    return detail
+      .map((d) => (Array.isArray(d.loc) ? d.loc.join('.') + ': ' : '') + (d.msg || JSON.stringify(d)))
+      .join('; ');
+  }
+  return fallback;
+}
+
 async function api(path, opts) {
   const res = await fetch(path, opts);
   const body = await res.json().catch(() => null);
-  if (!res.ok) throw new Error((body && body.detail) || res.statusText);
+  if (!res.ok) throw new Error(errorMessage(body, res.statusText));
   return body;
 }
 
@@ -278,6 +291,10 @@ function renderCustomForm() {
   const runBtn = el('button', { class: 'run' }, ['Run (requires ANTHROPIC_API_KEY)']);
   const resultHolder = el('div', {});
   runBtn.addEventListener('click', async () => {
+    if (!textarea.value.trim() || !codeInput.value) {
+      alert('Paste HL7v2/FHIR text and a primary code first.');
+      return;
+    }
     runBtn.disabled = true;
     runBtn.textContent = 'Running…';
     resultHolder.innerHTML = '';
@@ -330,7 +347,10 @@ function renderPdfForm() {
   const resultHolder = el('div', {});
   runBtn.addEventListener('click', async () => {
     if (!fileInput.files[0]) { alert('Choose a PDF file first.'); return; }
-    if (!accessionInput.value || !dateInput.value) { alert('Accession number and date of service are required.'); return; }
+    if (!accessionInput.value || !dateInput.value || !codeInput.value) {
+      alert('Accession number, date of service, and primary code are all required.');
+      return;
+    }
 
     runBtn.disabled = true;
     runBtn.textContent = 'Running…';
@@ -343,8 +363,8 @@ function renderPdfForm() {
       form.append('primary_code', codeInput.value);
 
       const res = await fetch('/api/custom/pdf-run', { method: 'POST', body: form });
-      const r = await res.json();
-      if (!res.ok) throw new Error(r.detail || res.statusText);
+      const r = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(errorMessage(r, res.statusText));
 
       resultHolder.appendChild(specimensCard(r.case));
       resultHolder.appendChild(narrativeCard(r.case));
