@@ -77,11 +77,14 @@ class AnthropicClient:
         self._client = anthropic.Anthropic()
 
     def create_message(self, *, model: str, prompt: str) -> tuple[str, int, int]:
+        # No `temperature` override: determinism here comes from the schema
+        # (abstain rather than guess, every claim evidence-verified), not
+        # from sampling settings -- and newer models reject `temperature`
+        # as a deprecated parameter outright.
         response = self._client.messages.create(
             model=model,
             max_tokens=MAX_TOKENS,
             messages=[{"role": "user", "content": prompt}],
-            extra_body={"temperature": 0},
         )
         text = "".join(
             block.text for block in response.content if getattr(block, "type", None) == "text"
