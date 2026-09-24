@@ -115,11 +115,17 @@ just picks whichever is set, in this order):
 - `GROQ_API_KEY` — a free-tier alternative hosting open-source models
   (get one at [console.groq.com](https://console.groq.com)), useful for
   testing without any Anthropic spend. Defaults to
-  `llama-3.3-70b-versatile`. Not to be confused with the next one —
+  `llama-3.1-8b-instant`. Not to be confused with the next one —
   "Groq" (the inference host) and "Grok" (xAI's model) are easy to mix
   up but are different services with different keys.
 - `XAI_API_KEY` — xAI's Grok API (api.x.ai), a paid/metered API like
   Anthropic's, not a free tier. Defaults to `grok-4`.
+
+Each backend's model can be overridden without a code change —
+`ANTHROPIC_MODEL` / `GROQ_MODEL` / `XAI_MODEL` — since Groq's and xAI's
+catalogs move fast enough that a hardcoded default can go stale (this
+happened once already during this project's own testing: a "model does
+not exist" 404 from Groq).
 
 This is a hand-testing console, not a production review service — see
 `pipeline/api/` for that pattern applied to the older demo build.

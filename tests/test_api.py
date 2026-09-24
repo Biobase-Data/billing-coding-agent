@@ -239,6 +239,30 @@ class TestResolveLiveClient:
         assert exc_info.value.status_code == 400
         assert "XAI_API_KEY" in exc_info.value.detail
 
+    def test_groq_model_can_be_overridden_without_a_code_change(self, monkeypatch):
+        """Regression: Groq's catalog moves fast enough that a hardcoded
+        default has already gone stale once in this project's own
+        testing ("model does not exist") -- an env var override means
+        that doesn't require waiting on a code change to unblock."""
+        self._clear_all_keys(monkeypatch)
+        monkeypatch.setenv("GROQ_API_KEY", "test-key")
+        monkeypatch.setenv("GROQ_MODEL", "some-other-model-name")
+        _model_client, model = _resolve_live_client()
+        assert model == "some-other-model-name"
+
+    def test_anthropic_and_xai_models_can_also_be_overridden(self, monkeypatch):
+        self._clear_all_keys(monkeypatch)
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+        monkeypatch.setenv("ANTHROPIC_MODEL", "claude-opus-5-5")
+        _model_client, model = _resolve_live_client()
+        assert model == "claude-opus-5-5"
+
+        self._clear_all_keys(monkeypatch)
+        monkeypatch.setenv("XAI_API_KEY", "test-key")
+        monkeypatch.setenv("XAI_MODEL", "grok-3")
+        _model_client, model = _resolve_live_client()
+        assert model == "grok-3"
+
 
 def test_pdf_run_falls_back_to_groq_when_only_groq_key_set(monkeypatch):
     """The endpoint-level guard accepts GROQ_API_KEY too, not just

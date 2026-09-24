@@ -200,14 +200,25 @@ above:
    verification happens on whoever actually runs the server with a real
    key, not here.
 
-   That gap showed up in practice: a real Groq key returned `403: error
-   code 1010` on the first live try, which is Cloudflare's own bot-
-   signature block (Groq's API sits behind Cloudflare), not an error
-   from Groq's application at all -- caused by `urllib`'s default
-   User-Agent (`Python-urllib/3.x`), which such WAFs commonly
-   fingerprint and reject outright. `_call_openai_compatible_chat` now
-   sends an explicit `User-Agent` header for this reason. xAI's key
-   didn't trip the same block (it returned a proper JSON
-   `permission-denied` from xAI's own application layer), so this is
-   apparently Groq-specific WAF behavior, but the fix applies to both
-   clients since they share the one HTTP helper.
+   That gap showed up in practice, twice, on the very first live tries:
+
+   - A real Groq key returned `403: error code 1010` first, which is
+     Cloudflare's own bot-signature block (Groq's API sits behind
+     Cloudflare), not an error from Groq's application at all -- caused
+     by `urllib`'s default User-Agent (`Python-urllib/3.x`), which such
+     WAFs commonly fingerprint and reject outright.
+     `_call_openai_compatible_chat` now sends an explicit `User-Agent`
+     header for this reason. xAI's key didn't trip the same block (it
+     returned a proper JSON `permission-denied` from xAI's own
+     application layer), so this is apparently Groq-specific WAF
+     behavior, but the fix applies to both clients since they share the
+     one HTTP helper.
+   - Past that block, Groq then returned `404: model_not_found` for
+     `GROQ_DEFAULT_MODEL`'s original value (`llama-3.3-70b-versatile`)
+     -- exactly the "Groq's catalog changes faster" risk this note
+     already predicted, playing out within the same session. Fixed the
+     default to `llama-3.1-8b-instant` (Groq's smallest/most
+     universally-available model, the safest bet against future churn)
+     and added `ANTHROPIC_MODEL`/`GROQ_MODEL`/`XAI_MODEL` env var
+     overrides in `_resolve_live_client()`, so the next catalog change
+     doesn't require waiting on a code change to unblock testing.

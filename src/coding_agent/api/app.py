@@ -78,13 +78,20 @@ def _resolve_live_client() -> tuple[ModelClient, str]:
     """Pick a live ModelClient from whichever provider has a key set in
     the server's environment, checked in this order: Anthropic (this
     project's default model), then Groq's free tier, then xAI's Grok.
-    Raises HTTPException(400) if none is configured."""
+    Raises HTTPException(400) if none is configured.
+
+    Each provider's model name can be overridden with its own env var
+    (`ANTHROPIC_MODEL` / `GROQ_MODEL` / `XAI_MODEL`) rather than only a
+    code change -- Groq's and xAI's catalogs in particular change fast
+    enough that a hardcoded default has already gone stale once during
+    this project's own testing (see ASSUMPTIONS.md).
+    """
     if os.environ.get("ANTHROPIC_API_KEY"):
-        return AnthropicClient(), DEFAULT_MODEL
+        return AnthropicClient(), os.environ.get("ANTHROPIC_MODEL", DEFAULT_MODEL)
     if os.environ.get("GROQ_API_KEY"):
-        return GroqClient(), GROQ_DEFAULT_MODEL
+        return GroqClient(), os.environ.get("GROQ_MODEL", GROQ_DEFAULT_MODEL)
     if os.environ.get("XAI_API_KEY"):
-        return GrokClient(), GROK_DEFAULT_MODEL
+        return GrokClient(), os.environ.get("XAI_MODEL", GROK_DEFAULT_MODEL)
     raise HTTPException(status_code=400, detail=_NO_API_KEY_DETAIL)
 
 
