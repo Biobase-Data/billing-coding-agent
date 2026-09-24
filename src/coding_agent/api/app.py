@@ -33,6 +33,7 @@ from io import BytesIO
 from pathlib import Path
 from typing import Any, Literal
 
+import anthropic
 import pypdf
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
@@ -186,6 +187,12 @@ def _run_live_pipeline(
     try:
         extraction, _metrics = extract_specimen_mentions(case, client=client, model=model)
     except ModelRequestError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    except anthropic.APIError as exc:
+        # AnthropicClient doesn't wrap the SDK's own exceptions the way
+        # GroqClient/GrokClient wrap urllib's -- catch its actual base
+        # class here instead of letting a credit-balance/rate-limit/auth
+        # failure surface as a bare 500 with no readable detail.
         raise HTTPException(status_code=502, detail=str(exc)) from exc
     recommendation = build_recommendation(case, extraction, baseline=(), primary_code=primary_code)
     audited = stamp(

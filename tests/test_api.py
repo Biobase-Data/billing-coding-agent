@@ -254,3 +254,42 @@ def test_pdf_run_falls_back_to_groq_when_only_groq_key_set(monkeypatch):
     )
     assert resp.status_code == 422  # past the key gate; failed at section-recognition instead
     assert "no recognized section" in resp.json()["detail"]
+
+
+def test_anthropic_sdk_failure_becomes_a_clean_502_not_a_500(monkeypatch):
+    """Regression: a live Anthropic call failing at the SDK level (e.g.
+    "Your credit balance is too low") must not crash as an unhandled
+    500 -- it has to come back as a readable error, same as a Groq/Grok
+    request failure does."""
+    import anthropic
+    import httpx
+
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    monkeypatch.delenv("XAI_API_KEY", raising=False)
+
+    class FailingAnthropicClient:
+        def create_message(self, *, model, prompt):
+            request = httpx.Request("POST", "https://api.anthropic.com/v1/messages")
+            raise anthropic.APIError(
+                "Your credit balance is too low to access the Anthropic API.",
+                request,
+                body=None,
+            )
+
+    import coding_agent.api.app as app_module
+
+    monkeypatch.setattr(app_module, "AnthropicClient", FailingAnthropicClient)
+
+    valid_hl7 = (
+        "MSH|^~\\&|LIS|SYNTHLAB|RECV|RECV|20260115103000||ORU^R01|MSG00001|P|2.5.1\n"
+        "OBR|1|ORD0001|S26-0042760|88305^Surgical Pathology^CPT|||20260115103000\n"
+        "SPM|1|S26-0042760&A||TISS^Tissue^HL70487\n"
+        "OBX|1|TX|GROSS^Gross Description^L||One specimen labeled A.||||||F\n"
+    )
+    resp = client.post(
+        "/api/custom/run",
+        json={"source_format": "hl7v2", "raw_text": valid_hl7, "primary_code": "88305"},
+    )
+    assert resp.status_code == 502
+    assert "credit balance" in resp.json()["detail"]
