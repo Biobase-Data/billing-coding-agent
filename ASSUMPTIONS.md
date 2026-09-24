@@ -233,3 +233,67 @@ above:
      env var override exists precisely because this catalog is per-
      account, not just per-provider-and-changing-over-time as first
      assumed.
+
+9. **CPT surgical-pathology level recommendation — a demo-scale table,
+   ported not reinvented.** `rules/cpt_level.py`'s `SPECIMEN_LEVEL_TABLE`
+   and `categorize_site` are a faithful port of `pipeline/map/catalog.py`'s
+   already-cited table (biopsy/skin, polypectomy/gi, biopsy/prostate ->
+   88305 — the only combinations this project's own fixtures exercise),
+   not a reinvention: same provenance claim (standard, widely published
+   AP-coding convention, never AMA descriptor text), same posture
+   (`CptLevelUnmappedError` rather than guessing a level for anything not
+   in the table). One deliberate improvement carried over: whole-word
+   keyword matching from the start, rather than pipeline's original
+   plain-substring matching (which had a real, later-fixed bug there —
+   "ear" matching inside "forearm" — for a different table in the same
+   file). This table needs the same commercial-AP-coder sign-off
+   `pipeline/`'s original judgment calls do before any real use.
+
+   `extract/procedure_type.py` supplies the other half (each specimen's
+   procedure type, e.g. "biopsy") the table needs; `Specimen.site` — a
+   structured field from the LIS, already present on the canonical
+   `Case` — supplies the site half without needing narrative extraction
+   at all. A specimen with an absent or unrecognized site, or a
+   procedure-type/site combination not in the table, is reported in
+   `CptLevelRecommendation.unaddressed_specimen_ids` rather than
+   guessed past or silently dropped.
+
+10. **A second recommendation shape, not a shoehorned reuse of the
+    first.** `recommend/cpt_level.py`'s `CptLevelFinding` carries both
+    `baseline_code` and `recommended_code` on one object, rather than
+    reusing `RecommendationLine`'s ADDITION/REMOVAL split. The two
+    capabilities' "absence" semantics genuinely differ: a unit-
+    reconciliation REMOVAL's evidence is a true absence (nothing to
+    quote, so `RecommendationLine` forbids evidence on it); a wrong CPT
+    level is always backed by *positive* evidence (the procedure-type
+    extraction that drove the correct code), so forcing it through the
+    same evidence-forbidden-on-REMOVAL rule would misrepresent the
+    finding, not just reshape it. This still satisfies "never an
+    additions-only code path": the same call that proposes adding a
+    level for an unbilled specimen can just as easily propose a *lower*
+    level for an over-billed one (see
+    `test_bidirectional_single_call_can_both_add_and_change_at_once`).
+
+    `BaselineLine` gained an optional `specimen_id` field for this
+    (backward compatible — unit reconciliation never reads it, and
+    every existing baseline in tests/eval fixtures omits it, defaulting
+    to `None`). `audit/stamp.py`'s `stamp()` was generalized to accept
+    either recommendation type via a `Recommendation | CptLevelRecommendation`
+    union rather than duplicated into a second stamping function, since
+    it never inspects a recommendation's contents anyway.
+
+11. **CPT-level recommendation is live-only for now — not in the offline
+    eval corpus.** `eval/cases/*.json` fixtures only ever recorded a
+    specimens_v1 model response; extending them to also cover
+    procedure_type_v1 (a second recorded response per fixture, plus
+    expected procedure-type/CPT-level ground truth) is real, undone
+    work. Until then, `eval/harness.py`'s `run_eval_case` and the test
+    console's sample-corpus path only exercise unit reconciliation; CPT-
+    level recommendation is only reachable through the two live-model
+    custom-input paths (`/api/custom/run`, `/api/custom/pdf-run`), which
+    now run both extraction tasks against the same case and return both
+    recommendations together — verified end-to-end with a fake client
+    standing in for the live model
+    (`test_custom_run_wires_in_cpt_level_recommendation_alongside_unit_reconciliation`),
+    not yet verified against a real model call from this build
+    environment (same caveat as the Groq/Grok backends themselves).

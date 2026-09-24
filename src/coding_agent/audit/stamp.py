@@ -1,10 +1,17 @@
-"""Stamp a Recommendation with the versions that produced it.
+"""Stamp a Recommendation (either capability's) with the versions that
+produced it.
 
 Nothing here is inferred at read time: the pipeline version is a
 constant bumped by hand when this codebase's recommend/rules assembly
 logic changes; the model and prompt versions come from the extraction
-that fed the recommendation; the rules version comes from rules/units.py
-itself; the code-set year comes from the case's date of service.
+that fed the recommendation; the rules version comes from whichever
+rules/ module produced it (`rules/units.py` or `rules/cpt_level.py`);
+the code-set year comes from the case's date of service.
+
+`stamp()` itself never inspects a recommendation's contents -- it only
+wraps whichever one it's given with a version stamp and a timestamp --
+so this is one stamping function for every recommend/ capability, not
+one per capability.
 """
 
 from __future__ import annotations
@@ -14,6 +21,7 @@ from datetime import date, datetime, timezone
 from pydantic import BaseModel, ConfigDict
 
 from coding_agent.extract.schema import ExtractionMetadata
+from coding_agent.recommend.cpt_level import CptLevelRecommendation
 from coding_agent.recommend.schema import Recommendation
 
 PIPELINE_VERSION = "coding_agent_v0"
@@ -32,13 +40,13 @@ class VersionStamp(BaseModel):
 class AuditedRecommendation(BaseModel):
     model_config = ConfigDict(frozen=True)
 
-    recommendation: Recommendation
+    recommendation: Recommendation | CptLevelRecommendation
     version_stamp: VersionStamp
     produced_at: datetime
 
 
 def stamp(
-    recommendation: Recommendation,
+    recommendation: Recommendation | CptLevelRecommendation,
     *,
     extraction_metadata: ExtractionMetadata,
     rules_version: str,

@@ -317,3 +317,60 @@ def test_anthropic_sdk_failure_becomes_a_clean_502_not_a_500(monkeypatch):
     )
     assert resp.status_code == 502
     assert "credit balance" in resp.json()["detail"]
+
+
+def test_custom_run_wires_in_cpt_level_recommendation_alongside_unit_reconciliation(monkeypatch):
+    """End-to-end success path for the new dual-extraction wiring: one
+    request runs both specimen-mention extraction (unit reconciliation)
+    and procedure-type extraction (CPT-level recommendation) against the
+    same case, and both results come back correctly in one response."""
+    import coding_agent.api.app as app_module
+
+    class SequencedFakeClient:
+        def __init__(self, responses):
+            self._responses = list(responses)
+            self.calls = 0
+
+        def create_message(self, *, model, prompt):
+            response = self._responses[self.calls]
+            self.calls += 1
+            return response, 10, 5
+
+    specimens_response = (
+        '{"abstain": false, "mentions": '
+        '[{"label": "A", "section": "diagnosis", "quoted": "A. Skin, left forearm"}]}'
+    )
+    procedure_type_response = (
+        '{"abstain": false, "mentions": '
+        '[{"label": "A", "procedure_type": "biopsy", "section": "gross", '
+        '"quoted": "a shave biopsy labeled A"}]}'
+    )
+    fake_client = SequencedFakeClient([specimens_response, procedure_type_response])
+    monkeypatch.setattr(app_module, "_resolve_live_client", lambda: (fake_client, "test-model"))
+
+    valid_hl7 = (
+        "MSH|^~\\&|LIS|SYNTHLAB|RECV|RECV|20260115103000||ORU^R01|MSG00001|P|2.5.1\n"
+        "OBR|1|ORD0001|S26-0042760|88305^Surgical Pathology^CPT|||20260115103000\n"
+        "SPM|1|S26-0042760&A||TISS^Tissue^HL70487||||71854001^Skin of left forearm^SCT\n"
+        "OBX|1|TX|GROSS^Gross Description^L||Received in formalin, a shave biopsy labeled A.||||||F\n"
+        "OBX|2|TX|DX^Diagnosis^L||A. Skin, left forearm: compound nevus.||||||F\n"
+    )
+    resp = client.post(
+        "/api/custom/run",
+        json={"source_format": "hl7v2", "raw_text": valid_hl7, "primary_code": "88305"},
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+
+    assert fake_client.calls == 2
+    assert body["actual_labels"] == ["A"]
+    assert body["recommendation"]["lines"] == []  # narrative agrees with accessioning
+
+    assert body["cpt_level"]["blocked"] is None
+    findings = body["cpt_level"]["findings"]
+    assert len(findings) == 1
+    assert findings[0]["specimen_id"] == "A"
+    assert findings[0]["recommended_code"] == "88305"
+    assert findings[0]["baseline_code"] is None
+    assert body["cpt_level_audited"]["version_stamp"]["rules_version"] == "cpt_level_v1"
+    assert body["cpt_level_audited"]["version_stamp"]["prompt_version"] == "procedure_type_v1"

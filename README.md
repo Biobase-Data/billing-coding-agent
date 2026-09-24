@@ -6,12 +6,15 @@ This repo holds two builds, in sequence:
   focus). A stricter, from-scratch architecture: a canonical `Case` object
   with explicit absence semantics, a hard-enforced `extract/` ↔ `rules/`
   layer boundary, bidirectional-always recommendations (every code path
-  that can add a unit can also flag one for removal), first-class
-  abstention, and full version stamping on every output. V0's scope is
-  narrow and deliberate: **specimen unit reconciliation, offline/
-  retrospective** — reconciling the narrative's specimen labels against
-  the accessioning record's specimen list, nothing more. See "V0:
-  `src/coding_agent/`" below.
+  that can add a code or unit can also flag one for removal or correction),
+  first-class abstention, and full version stamping on every output. V0's
+  scope started narrow and deliberate — **specimen unit reconciliation,
+  offline/retrospective** — and has since grown one capability:
+  **CPT surgical-pathology level recommendation** (88302-88309), still
+  offline/retrospective, still bare code identifiers only. ICD-10 diagnosis
+  coding, stains/IHC, and modifiers remain out of scope for V0 (they exist
+  only in the older `pipeline/` build below). See "V0: `src/coding_agent/`"
+  below.
 - **`pipeline/` — the earlier demo build** (described in the rest of this
   file). A broader, phase-built pipeline (extraction → deterministic
   mapping → validation → coder review UI → evaluation) covering CPT
@@ -28,31 +31,57 @@ every place those calls are encoded in the code.
 
 ```
 src/coding_agent/
-  normalize/   canonical Case object; HL7v2 ORU^R01 and FHIR R4 -> Case
+  normalize/   canonical Case object; HL7v2 ORU^R01 and FHIR R4 -> Case;
+               free_text.py for signed-out report PDFs (specimens always
+               come back Absent there -- see its own docstring).
   extract/     probabilistic layer -- facts + evidence spans only, never
-               a billing code. specimens.py: find every specimen label
-               the narrative names, or abstain.
-  rules/       deterministic layer -- units.py: reconcile the narrative's
-               specimen labels against the accessioning record's list.
-               Pure functions, table-driven, versioned.
+               a billing code.
+                 specimens.py: find every specimen label the narrative
+                 names, or abstain. Also home to the shared model-client
+                 machinery (Anthropic/Groq/Grok adapters) every
+                 extraction task uses.
+                 procedure_type.py: find each specimen's procedure type
+                 (biopsy, excision, polypectomy, ...), or abstain --
+                 feeds CPT leveling below.
+  rules/       deterministic layer -- pure functions, table-driven,
+               versioned, one file per concern.
+                 units.py: reconcile the narrative's specimen labels
+                 against the accessioning record's list.
+                 cpt_level.py: specimen procedure-type + site -> CPT
+                 surgical-pathology level (88302-88309); a demo-scale
+                 table (ported from the pipeline/ build's own cited
+                 table), raises rather than guessing past a combination
+                 it doesn't have.
   recommend/   assembles rules/ + extract/ output into a bidirectional
-               diff: every call computes both addition and removal
-               candidates together, never one direction only.
-  audit/       version-stamps every recommendation (model, prompt, rules,
-               code-set year) and the append-only coder action log.
+               diff, one file per capability, sharing Blocked/
+               BlockedReason/BaselineLine (recommend/schema.py):
+                 assemble.py: specimen-unit ADDITION/REMOVAL -- every
+                 call computes both candidates together, never one
+                 direction only.
+                 cpt_level.py: a CptLevelFinding per specimen whose
+                 recommended code differs from its baseline (or has
+                 none) -- addition and correction from the same call,
+                 including corrections that lower what's billed.
+  audit/       version-stamps every recommendation, either capability's
+               (model, prompt, rules, code-set year) and the append-only
+               coder action log.
+  api/         local-only FastAPI test console + a single-page vanilla-JS
+               UI -- run the offline sample corpus, or paste HL7/FHIR/
+               upload a PDF against a live model (Anthropic/Groq/Grok).
+               See "Local test console" below.
 eval/          corpus harness, metrics (label precision/recall, F1,
                abstention rate), and a run-to-run repeatability check.
                eval/cases/*.json are self-contained fixtures: a Case, a
                recorded model response, and expected ground truth --
-               the corpus runs offline, no API key required.
+               the corpus runs offline, no API key required. (Currently
+               specimen-unit reconciliation only; CPT-level recommendation
+               isn't in the offline corpus yet -- see ASSUMPTIONS.md.)
 tools/
   corpus_inventory.py   normalize/-layer diagnostic: given a directory of
                         raw HL7/FHIR exports, reports which cases can
                         even supply a structured specimen list to
                         reconcile against, before any extraction runs.
-tests/         test_case.py, test_normalize.py, test_extract_specimens.py,
-               test_rules_units.py, test_recommend.py, test_audit.py,
-               test_eval.py, test_corpus_inventory.py, and
+tests/         one test file per module above, plus
                test_layer_boundary.py -- an AST-based static check (with
                a self-verifying meta-test) that extract/ and rules/
                never import each other.
@@ -94,7 +123,9 @@ It gives you three ways to try it:
 - **Custom HL7v2/FHIR input** — paste your own HL7v2 message or FHIR R4
   Bundle JSON and run it through a **live** model call; returns a clear
   400 without a key configured rather than silently falling back to
-  anything.
+  anything. Both extraction tasks run against it: specimen-unit
+  reconciliation *and* CPT-level recommendation, shown as two separate
+  result cards.
 - **Custom PDF report** — upload a signed-out surgical pathology report
   PDF directly (`normalize/free_text.py` extracts text via `pypdf` and
   splits it into narrative sections by header keyword: Clinical History /
@@ -102,9 +133,10 @@ It gives you three ways to try it:
   narrow allowlist of signature-block/CLIA/legal boilerplate before the
   text reaches the model). A bare PDF has no structured accessioning
   specimen list the way an HL7/FHIR feed does, so `Case.specimens`
-  always comes back `Absent` here and reconciliation correctly reports
-  **Blocked** rather than inventing a specimen count from the narrative
-  — you'll still see what labels the narrative itself names.
+  always comes back `Absent` here and **both** capabilities correctly
+  report Blocked rather than inventing a specimen count or a site from
+  the narrative — you'll still see what labels and procedure types the
+  narrative itself names.
 
 The two live-model paths need a key for **any one** of three
 interchangeable backends (`extract/specimens.py`'s `ModelClient` Protocol

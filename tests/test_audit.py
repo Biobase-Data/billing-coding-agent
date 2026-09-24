@@ -10,7 +10,9 @@ from pydantic import ValidationError
 from coding_agent.audit.log import ActionLog, CoderAction, record_action
 from coding_agent.audit.stamp import PIPELINE_VERSION, stamp
 from coding_agent.extract.schema import ExtractionMetadata
+from coding_agent.recommend.cpt_level import CptLevelRecommendation
 from coding_agent.recommend.schema import Recommendation
+from coding_agent.rules.cpt_level import RULES_VERSION as CPT_LEVEL_RULES_VERSION
 from coding_agent.rules.units import RULES_VERSION
 
 
@@ -27,6 +29,23 @@ def test_stamp_carries_every_required_version_field():
     assert audited.version_stamp.prompt_version == "specimens_v1"
     assert audited.version_stamp.rules_version == RULES_VERSION
     assert audited.version_stamp.code_set_year == 2026
+    assert audited.recommendation is recommendation
+
+
+def test_stamp_also_works_for_cpt_level_recommendations():
+    """stamp() is one function for both recommend/ capabilities -- prove
+    it round-trips a CptLevelRecommendation, not just a Recommendation,
+    preserving its exact type through the Union field."""
+    recommendation = CptLevelRecommendation(case_id="case-1", baseline=(), findings=())
+    audited = stamp(
+        recommendation,
+        extraction_metadata=ExtractionMetadata(model_version="claude-sonnet-5", prompt_version="procedure_type_v1"),
+        rules_version=CPT_LEVEL_RULES_VERSION,
+        date_of_service=date(2026, 3, 15),
+    )
+    assert audited.version_stamp.rules_version == CPT_LEVEL_RULES_VERSION
+    assert audited.version_stamp.prompt_version == "procedure_type_v1"
+    assert isinstance(audited.recommendation, CptLevelRecommendation)
     assert audited.recommendation is recommendation
 
 

@@ -1,11 +1,15 @@
 """V0 core: extract every specimen label the narrative text describes,
 with evidence, or abstain.
 
-This is deliberately the only extraction task in V0. It answers a
-counting question with verifiable ground truth (rules/units.py
-reconciles the result against Case.specimens, the accessioning record)
-rather than a judgment call -- see the top-level README, "V0 scope:
-specimen unit capture".
+The first of V0's extraction tasks (see extract/procedure_type.py for
+the second, added to support CPT surgical-pathology leveling). This one
+answers a counting question with verifiable ground truth
+(rules/units.py reconciles the result against Case.specimens, the
+accessioning record) rather than a judgment call -- see the top-level
+README, "V0 scope: specimen unit capture". Also home to the shared
+model-client machinery (`ModelClient`, `AnthropicClient`, `GroqClient`,
+`GrokClient`, the OpenAI-compatible HTTP helper) every extraction task
+in this package uses.
 """
 
 from __future__ import annotations

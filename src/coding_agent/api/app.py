@@ -42,6 +42,7 @@ from pydantic import BaseModel
 
 from coding_agent.audit.log import ActionLog, CoderAction, record_action
 from coding_agent.audit.stamp import stamp
+from coding_agent.extract.procedure_type import extract_procedure_types
 from coding_agent.extract.specimens import (
     DEFAULT_MODEL,
     GROK_DEFAULT_MODEL,
@@ -58,6 +59,8 @@ from coding_agent.normalize.fhir import FhirNormalizationError, parse_bundle
 from coding_agent.normalize.free_text import FreeTextNormalizationError, parse_report_text
 from coding_agent.normalize.hl7v2 import Hl7NormalizationError, parse_oru
 from coding_agent.recommend.assemble import build_recommendation
+from coding_agent.recommend.cpt_level import build_cpt_level_recommendation
+from coding_agent.rules.cpt_level import RULES_VERSION as CPT_LEVEL_RULES_VERSION
 from coding_agent.rules.units import RULES_VERSION
 from eval.harness import load_corpus, run_eval_case
 
@@ -186,21 +189,32 @@ class CustomRunRequest(BaseModel):
     primary_code: str
 
 
+def _call_model(fn, *args, **kwargs):
+    """Run a model-calling extraction function, converting either
+    OpenAI-compatible or Anthropic SDK failures into a clean 502 instead
+    of a bare 500 -- see ASSUMPTIONS.md for why both exception types
+    need catching separately."""
+    try:
+        return fn(*args, **kwargs)
+    except ModelRequestError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    except anthropic.APIError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
 def _run_live_pipeline(
     case: Case, primary_code: str, client: ModelClient, model: str
 ) -> dict[str, Any]:
     """Shared tail of both custom-input endpoints: live extraction ->
-    bidirectional recommendation -> version stamp -> response dict."""
-    try:
-        extraction, _metrics = extract_specimen_mentions(case, client=client, model=model)
-    except ModelRequestError as exc:
-        raise HTTPException(status_code=502, detail=str(exc)) from exc
-    except anthropic.APIError as exc:
-        # AnthropicClient doesn't wrap the SDK's own exceptions the way
-        # GroqClient/GrokClient wrap urllib's -- catch its actual base
-        # class here instead of letting a credit-balance/rate-limit/auth
-        # failure surface as a bare 500 with no readable detail.
-        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    bidirectional recommendation -> version stamp -> response dict.
+
+    Runs both of V0's extraction tasks against the same case: specimen
+    labels (unit reconciliation) and procedure types (CPT-level
+    recommendation). The two are independent findings on the same case,
+    not a pipeline -- one abstaining or blocking never suppresses the
+    other.
+    """
+    extraction, _metrics = _call_model(extract_specimen_mentions, case, client=client, model=model)
     recommendation = build_recommendation(case, extraction, baseline=(), primary_code=primary_code)
     audited = stamp(
         recommendation,
@@ -211,6 +225,20 @@ def _run_live_pipeline(
     actual_labels = (
         None if extraction.abstained else sorted(m.label for m in extraction.mentions)
     )
+
+    procedure_type_extraction, _pt_metrics = _call_model(
+        extract_procedure_types, case, client=client, model=model
+    )
+    cpt_level_recommendation = build_cpt_level_recommendation(
+        case, procedure_type_extraction, baseline=()
+    )
+    cpt_level_audited = stamp(
+        cpt_level_recommendation,
+        extraction_metadata=procedure_type_extraction.metadata,
+        rules_version=CPT_LEVEL_RULES_VERSION,
+        date_of_service=case.date_of_service,
+    )
+
     return {
         "case_id": case.case_id,
         "actual_labels": actual_labels,
@@ -218,6 +246,8 @@ def _run_live_pipeline(
         "case": _dump(case),
         "recommendation": _dump(recommendation),
         "audited": _dump(audited),
+        "cpt_level": _dump(cpt_level_recommendation),
+        "cpt_level_audited": _dump(cpt_level_audited),
     }
 
 

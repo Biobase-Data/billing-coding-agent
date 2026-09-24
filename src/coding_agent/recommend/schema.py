@@ -30,6 +30,15 @@ class BaselineLine(BaseModel):
     code: str
     units: int
     modifiers: tuple[str, ...] = ()
+    specimen_id: str | None = None
+    """Which specimen this baseline line was billed against, when known.
+    Optional and defaulted to `None` for backward compatibility with the
+    unit-reconciliation capability, which never reads it (that
+    capability's baseline is informational only -- see this module's
+    docstring). `recommend/cpt_level.py` requires it: matching a
+    recommended code against what was already billed for that specific
+    specimen is the whole point of that capability's diff.
+    """
 
 
 class DiffKind(str, Enum):

@@ -85,6 +85,40 @@ class SpecimenMention(BaseModel):
         return self
 
 
+class ProcedureTypeMention(BaseModel):
+    """One specimen's procedure type as the narrative describes it (e.g.
+    "biopsy", "polypectomy") -- the input `rules/cpt_level.py` needs to
+    look up a CPT surgical-pathology level.
+
+    `procedure_type` is deliberately a plain, model-reported string, not
+    an enum tied to a billing table: extract/ never becomes aware of
+    which procedure-type/site combinations `rules/cpt_level.py` actually
+    has a code for (that would leak a billing-rule concept across the
+    extract/rules boundary this project enforces by static analysis --
+    see tests/test_layer_boundary.py). A category this narrative names
+    that the rules table doesn't recognize is `rules/cpt_level.py`'s
+    problem to raise on, not extract/'s to pre-filter.
+
+    `label` follows the same convention as `SpecimenMention.label` --
+    the narrative's own specimen label, not yet reconciled against the
+    accessioning record.
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    label: str
+    procedure_type: str
+    evidence: tuple[EvidenceSpan, ...]
+
+    @model_validator(mode="after")
+    def _at_least_one_evidence_span(self) -> "ProcedureTypeMention":
+        if not self.evidence:
+            raise ValueError(
+                "a fact with no evidence is not a fact -- it must not be emitted"
+            )
+        return self
+
+
 class ExtractionMetadata(BaseModel):
     """Recorded on every extraction result so a regression is
     interpretable and an audit response is possible -- see the
@@ -117,6 +151,30 @@ class SpecimenExtraction(BaseModel):
         if (self.mentions is None) == (self.abstention is None):
             raise ValueError(
                 "SpecimenExtraction requires exactly one of `mentions` or `abstention`"
+            )
+        return self
+
+    @property
+    def abstained(self) -> bool:
+        return self.abstention is not None
+
+
+class ProcedureTypeExtraction(BaseModel):
+    """The result of running procedure-type extraction on one case --
+    same exactly-one-of shape as `SpecimenExtraction`, for the same
+    reason (never let a caller silently drop an abstention)."""
+
+    model_config = ConfigDict(frozen=True)
+
+    mentions: tuple[ProcedureTypeMention, ...] | None = None
+    abstention: Abstention | None = None
+    metadata: ExtractionMetadata
+
+    @model_validator(mode="after")
+    def _exactly_one_of_mentions_or_abstention(self) -> "ProcedureTypeExtraction":
+        if (self.mentions is None) == (self.abstention is None):
+            raise ValueError(
+                "ProcedureTypeExtraction requires exactly one of `mentions` or `abstention`"
             )
         return self
 

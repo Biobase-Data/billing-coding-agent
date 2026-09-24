@@ -42,9 +42,11 @@
     background: rgba(255,255,255,0.02); }
   .line.addition { border-color: var(--addition); }
   .line.removal { border-color: var(--removal); }
+  .line.change { border-color: var(--blocked); }
   .line .kind { font-weight: 700; font-size: 12px; }
   .line.addition .kind { color: var(--addition); }
   .line.removal .kind { color: var(--removal); }
+  .line.change .kind { color: var(--blocked); }
   .line .meta { color: var(--muted); font-size: 12px; margin: 4px 0; }
   .line .rationale { font-size: 13px; margin: 6px 0; }
   .quote { font-style: italic; color: var(--muted); font-size: 12px; border-left: 2px solid var(--border);
@@ -213,6 +215,56 @@ function recommendationCard(result, caseId) {
   return card;
 }
 
+function cptLevelCard(result) {
+  const card = el('div', { class: 'card' }, [el('h3', {}, ['CPT Level Recommendation'])]);
+  const cpt = result.cpt_level;
+
+  if (cpt.blocked) {
+    card.appendChild(el('div', { class: 'blocked-banner' }, [
+      cpt.blocked.reason + ': ' + cpt.blocked.detail,
+    ]));
+  } else if (cpt.findings.length === 0 && cpt.unaddressed_specimen_ids.length === 0) {
+    card.appendChild(el('p', { class: 'empty' }, [
+      'No findings — every specimen’s recommended level matches its baseline.',
+    ]));
+  } else {
+    cpt.findings.forEach((finding) => card.appendChild(cptFindingCard(finding)));
+    if (cpt.unaddressed_specimen_ids.length > 0) {
+      card.appendChild(el('p', { class: 'empty' }, [
+        'Not addressed (no procedure type identified, or an unmapped procedure-type/site '
+          + 'combination): ' + cpt.unaddressed_specimen_ids.join(', '),
+      ]));
+    }
+  }
+
+  const stamp = result.cpt_level_audited.version_stamp;
+  card.appendChild(el('div', { class: 'stamp' }, [
+    el('span', {}, ['pipeline ' + stamp.pipeline_version]),
+    el('span', {}, ['model ' + stamp.model_version]),
+    el('span', {}, ['prompt ' + stamp.prompt_version]),
+    el('span', {}, ['rules ' + stamp.rules_version]),
+    el('span', {}, ['code-set ' + stamp.code_set_year]),
+  ]));
+  return card;
+}
+
+function cptFindingCard(finding) {
+  const isAddition = finding.baseline_code === null;
+  const wrap = el('div', { class: 'line ' + (isAddition ? 'addition' : 'change') });
+  wrap.appendChild(el('span', { class: 'kind' }, [
+    (isAddition ? 'ADDITION' : 'CHANGE') + ' — specimen ' + finding.specimen_id,
+  ]));
+  wrap.appendChild(el('div', { class: 'meta' }, [
+    'recommended ' + finding.recommended_code
+      + (isAddition ? ' · no baseline code found' : ' · baseline was ' + finding.baseline_code),
+  ]));
+  wrap.appendChild(el('div', { class: 'rationale' }, [finding.rationale]));
+  for (const ev of finding.evidence) {
+    wrap.appendChild(el('div', { class: 'quote' }, ['"' + ev.quoted + '" (' + ev.section + ')']));
+  }
+  return wrap;
+}
+
 function lineCard(line, idx, caseId) {
   const wrap = el('div', { class: 'line ' + line.diff_kind });
   wrap.appendChild(el('span', { class: 'kind' }, [line.diff_kind.toUpperCase() + ' — specimen ' + line.specimen_id]));
@@ -311,6 +363,7 @@ function renderCustomForm() {
       resultHolder.appendChild(specimensCard(r.case));
       resultHolder.appendChild(narrativeCard(r.case));
       resultHolder.appendChild(recommendationCard(r, null));
+      resultHolder.appendChild(cptLevelCard(r));
     } catch (e) {
       resultHolder.appendChild(el('p', { class: 'error' }, [e.message]));
     }
@@ -369,6 +422,7 @@ function renderPdfForm() {
       resultHolder.appendChild(specimensCard(r.case));
       resultHolder.appendChild(narrativeCard(r.case));
       resultHolder.appendChild(recommendationCard(r, null));
+      resultHolder.appendChild(cptLevelCard(r));
     } catch (e) {
       resultHolder.appendChild(el('p', { class: 'error' }, [e.message]));
     }
