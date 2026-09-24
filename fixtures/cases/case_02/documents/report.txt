@@ -1,0 +1,41 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES
+Surgical Pathology Report
+
+Patient: PT-2026-0091                    Accession: S26-0041955
+Sex: M                                    Date Collected: 08/10/2026
+Ordering Provider: R. Okafor, MD (NPI 2345678901)   Date Reported: 08/12/2026
+
+CLINICAL HISTORY:
+61-year-old male, screening colonoscopy, family history of colon cancer.
+Six polyps identified and removed during the procedure, each submitted in
+a separate container per the endoscopist's labeling.
+
+SPECIMEN(S) RECEIVED:
+A. Colon polyp, ascending colon
+B. Colon polyp, hepatic flexure
+C. Colon polyp, transverse colon
+D. Colon polyp, splenic flexure
+E. Colon polyp, sigmoid colon
+F. Colon polyp, rectum
+
+GROSS DESCRIPTION:
+Six containers are received, each labeled with a distinct anatomic site as
+listed above and each containing a single polypoid fragment of mucosa
+ranging from 0.2 to 0.5 cm in greatest dimension. Each is submitted in its
+entirety in one cassette, one cassette per container (A1 through F1).
+
+MICROSCOPIC DESCRIPTION:
+A1: Colonic mucosa with a tubular adenoma, low-grade dysplasia.
+B1: Colonic mucosa with a hyperplastic polyp.
+C1: Colonic mucosa with a tubular adenoma, low-grade dysplasia.
+D1: Colonic mucosa with a hyperplastic polyp.
+E1: Colonic mucosa with a tubulovillous adenoma, low-grade dysplasia.
+F1: Colonic mucosa, unremarkable fragment with no polypoid lesion identified.
+
+DIAGNOSIS:
+A. Colon polyp, ascending colon: Tubular adenoma, low-grade dysplasia.
+B. Colon polyp, hepatic flexure: Hyperplastic polyp.
+C. Colon polyp, transverse colon: Tubular adenoma, low-grade dysplasia.
+D. Colon polyp, splenic flexure: Hyperplastic polyp.
+E. Colon polyp, sigmoid colon: Tubulovillous adenoma, low-grade dysplasia.
+F. Colon polyp, rectum: Benign colonic mucosa, no diagnostic abnormality.

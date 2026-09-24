@@ -1,0 +1,37 @@
+[
+  {
+    "fact_id": "f1-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "skin, right lower leg"
+      ],
+      "container_label": "A: skin, right lower leg"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 594,
+      "end": 632,
+      "quoted": "A. Skin, right lower leg, shave biopsy"
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f2-dx",
+    "fact_type": "diagnosis",
+    "value": {
+      "text": "actinic keratosis",
+      "certainty": "definitive",
+      "qualifier": null
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1271,
+      "end": 1289,
+      "quoted": "Actinic keratosis."
+    },
+    "confidence": "high"
+  }
+]

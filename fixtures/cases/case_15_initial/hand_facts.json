@@ -1,0 +1,37 @@
+[
+  {
+    "fact_id": "f1",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "skin, upper back"
+      ],
+      "container_label": "A: skin, upper back"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 460,
+      "end": 493,
+      "quoted": "A. Skin, upper back, shave biopsy"
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f2",
+    "fact_type": "diagnosis",
+    "value": {
+      "text": "compound nevus",
+      "certainty": "definitive",
+      "qualifier": null
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1122,
+      "end": 1137,
+      "quoted": "Compound nevus."
+    },
+    "confidence": "high"
+  }
+]

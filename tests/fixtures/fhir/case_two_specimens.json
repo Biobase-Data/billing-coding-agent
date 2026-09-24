@@ -1,0 +1,105 @@
+{
+  "resourceType": "Bundle",
+  "type": "collection",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "dr-1",
+        "identifier": [
+          {"system": "http://synthlab.example/accession", "value": "S26-0042762"}
+        ],
+        "effectiveDateTime": "2026-01-17T09:00:00Z",
+        "specimen": [
+          {"reference": "Specimen/spm-a"},
+          {"reference": "Specimen/spm-b"}
+        ],
+        "result": [
+          {"reference": "Observation/obs-clinhx"},
+          {"reference": "Observation/obs-gross"},
+          {"reference": "Observation/obs-micro"},
+          {"reference": "Observation/obs-dx-a"},
+          {"reference": "Observation/obs-dx-b"}
+        ],
+        "basedOn": [{"reference": "ServiceRequest/sr-1"}]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Specimen",
+        "id": "spm-a",
+        "accessionIdentifier": {"system": "http://synthlab.example/accession", "value": "S26-0042762"},
+        "identifier": [{"system": "http://synthlab.example/specimen-part", "value": "A"}],
+        "type": {"text": "Tissue"},
+        "collection": {"bodySite": {"text": "Skin of left forearm"}}
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Specimen",
+        "id": "spm-b",
+        "accessionIdentifier": {"system": "http://synthlab.example/accession", "value": "S26-0042762"},
+        "identifier": [{"system": "http://synthlab.example/specimen-part", "value": "B"}],
+        "type": {"text": "Tissue"},
+        "collection": {"bodySite": {"text": "Skin of right shoulder"}}
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-clinhx",
+        "code": {"text": "Clinical History"},
+        "valueString": "Rash on bilateral upper extremities."
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-gross",
+        "code": {"text": "Gross Description"},
+        "valueString": "Received in formalin, two specimens labeled A and B."
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-micro",
+        "code": {"text": "Microscopic Description"},
+        "valueString": "Sections show compound melanocytic proliferation."
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-dx-a",
+        "code": {"text": "Diagnosis"},
+        "valueString": "A. Skin, left forearm: compound nevus."
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-dx-b",
+        "code": {"text": "Diagnosis"},
+        "valueString": "B. Skin, right shoulder: compound nevus."
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "ServiceRequest",
+        "id": "sr-1",
+        "reasonCode": [{"text": "Rule out malignancy"}],
+        "requester": {"reference": "Practitioner/pr-1"}
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "pr-1",
+        "identifier": [
+          {"system": "http://hl7.org/fhir/sid/us-npi", "value": "1234567890"}
+        ]
+      }
+    }
+  ]
+}

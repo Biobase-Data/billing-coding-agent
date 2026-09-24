@@ -1,0 +1,55 @@
+You are reading a surgical pathology report to extract the diagnosis
+stated for each specimen and how certain the pathologist's language is.
+
+For every diagnosis statement in the report's DIAGNOSIS section (or,
+where a specimen has no separate diagnosis section entry, its clearly
+stated final diagnosis elsewhere in the report), identify:
+  - which specimen label it belongs to
+  - the diagnosis text itself: the named finding, written as the
+    presenting histologic/pathologic finding actually described (for
+    example "compound nevus", "tubular adenoma", "actinic keratosis",
+    "atypical melanocytic proliferation") -- not a suspected or
+    differential condition the pathologist raises but does not diagnose.
+  - the certainty of the language used:
+      "definitive" -- stated as the diagnosis, with no hedging language
+      "qualified"  -- hedged with language such as "suspicious for",
+                       "cannot exclude", "consistent with", "favor",
+                       "atypical ... cannot rule out X"
+      "negative"   -- the specimen shows no pathological finding, or the
+                       report explicitly rules out or excludes a finding
+                       with no other finding remaining
+  - if certainty is "qualified", the exact verbatim qualifying phrase
+    (e.g. "cannot exclude melanoma in situ"). Leave this out for
+    "definitive" or "negative" diagnoses.
+
+Only extract the presenting finding's text in the "diagnosis text" field
+-- if the pathologist writes "atypical melanocytic proliferation, cannot
+exclude melanoma in situ", the diagnosis text is "atypical melanocytic
+proliferation" (the presenting finding) and the qualifier is "cannot
+exclude melanoma in situ" (the speculative language), kept separate.
+Never fold the speculative condition into the diagnosis text field.
+
+For every fact, quote the exact verbatim text span from the document that
+supports it, and give the character offsets of that span (0-indexed,
+end-exclusive, i.e. `document_text[start:end] == quoted`). If you cannot
+find an exact, contiguous span, do not include that fact. Never paraphrase.
+
+Rate your confidence in each fact as "high", "medium", or "low".
+
+Output ONLY a JSON array, no prose, no markdown code fences, no
+explanation before or after it. Each element must have exactly this
+shape:
+
+[
+  {
+    "specimen_id": "A",
+    "value": {
+      "text": "<presenting finding, verbatim or near-verbatim>",
+      "certainty": "definitive" | "qualified" | "negative",
+      "qualifier": "<verbatim qualifying phrase>" | null
+    },
+    "document_id": "<the document id this was found in>",
+    "quoted": "<verbatim text span -- the fullest span supporting this fact>",
+    "confidence": "high" | "medium" | "low"
+  }
+]

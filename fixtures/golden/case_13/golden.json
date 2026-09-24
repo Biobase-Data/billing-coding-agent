@@ -1,0 +1,10 @@
+{
+  "unreviewed": true,
+  "expected_lines": [
+    {"code": "88305", "code_system": "CPT", "units": 1, "modifiers": [], "specimen_id": "A"},
+    {"code": "88341", "code_system": "CPT", "units": 1, "modifiers": [], "specimen_id": "A"}
+  ],
+  "expected_findings": [
+    {"rule_id": "add_on:88341", "severity": "blocker"}
+  ]
+}

@@ -1,0 +1,61 @@
+You are reading the narrative sections of a surgical pathology report.
+Your only job is to identify, for each specimen the narrative describes,
+what kind of procedure produced that specimen -- not to judge, count, or
+bill anything, and never to name or reason about billing codes.
+
+A procedure type is a short category such as "biopsy", "excision",
+"polypectomy", or "resection" -- however the report itself describes how
+the specimen was obtained. Use the report's own wording where it maps
+cleanly onto one of these categories; if the report uses a more specific
+term (e.g. "shave biopsy", "punch biopsy"), report the general category
+("biopsy") it belongs to.
+
+A specimen's own label is never a cassette or block identifier. Reports
+often divide one specimen's tissue into cassettes for processing (e.g.
+"submitted in cassettes A1-A7") -- "A1" through "A7" there name
+sub-parts of one specimen prepared for microscopy, not seven specimens.
+Key each procedure type to the specimen's own label, if it has one; if
+the narrative gives the specimen no distinct label of its own, only
+cassette or block identifiers, omit that specimen rather than keying a
+procedure type to one of its cassette numbers.
+
+For each specimen label, quote the exact verbatim text span that
+supports the procedure type you identified, and say which section it
+came from. Never paraphrase the quoted text.
+
+If you cannot determine a specimen's procedure type from the text --
+the report doesn't say, the wording is ambiguous, or two sections
+disagree -- do not report a procedure type for that specimen. Omitting
+one specimen is fine; it is not the same as abstaining for the whole
+case. Only abstain for the whole case if the narrative text overall is
+too garbled or inconsistent to extract anything from reliably.
+
+Output ONLY a JSON object, no prose, no markdown code fences, no
+explanation before or after it, matching exactly one of these two
+shapes.
+
+If you can determine at least some specimens' procedure types:
+
+{
+  "abstain": false,
+  "mentions": [
+    {
+      "label": "<verbatim specimen label, e.g. \"A\">",
+      "procedure_type": "<general category, e.g. \"biopsy\">",
+      "section": "gross" | "microscopic" | "diagnosis" | "clinical_history",
+      "quoted": "<verbatim text span supporting this procedure type in that section>"
+    }
+  ]
+}
+
+If you cannot determine any specimen's procedure type with confidence:
+
+{
+  "abstain": true,
+  "reason": "ambiguous_narrative" | "conflicting_evidence" | "low_model_confidence",
+  "detail": "<one sentence explaining why, with no patient-identifying detail>",
+  "mentions": []
+}
+
+"mentions" may be an empty array when abstain is false, if the
+narrative text genuinely names no procedure types at all.

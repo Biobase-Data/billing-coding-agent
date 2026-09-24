@@ -1,0 +1,56 @@
+[
+  {
+    "fact_id": "f1",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "left cheek",
+        "right cheek",
+        "forehead"
+      ],
+      "container_label": "shave biopsies x3: left cheek, right cheek, and forehead"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 452,
+      "end": 561,
+      "quoted": "A. Skin, received in a single container labeled \"shave biopsies x3: left\n   cheek, right cheek, and forehead\""
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f2",
+    "fact_type": "diagnosis",
+    "value": {
+      "text": "actinic keratosis",
+      "certainty": "definitive",
+      "qualifier": null
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1535,
+      "end": 1568,
+      "quoted": "Actinic keratosis, two fragments."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f3",
+    "fact_type": "diagnosis",
+    "value": {
+      "text": "seborrheic keratosis",
+      "certainty": "definitive",
+      "qualifier": null
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1574,
+      "end": 1609,
+      "quoted": "Seborrheic keratosis, one fragment."
+    },
+    "confidence": "high"
+  }
+]

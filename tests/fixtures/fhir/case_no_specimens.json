@@ -1,0 +1,25 @@
+{
+  "resourceType": "Bundle",
+  "type": "collection",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "dr-2",
+        "identifier": [
+          {"system": "http://synthlab.example/accession", "value": "S26-0042763"}
+        ],
+        "effectiveDateTime": "2026-01-18",
+        "result": [{"reference": "Observation/obs-dx"}]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-dx",
+        "code": {"text": "Diagnosis"},
+        "valueString": "Benign nevus, skin."
+      }
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES
+Surgical Pathology Report
+
+Patient: PT-2026-0091                    Accession: S26-0042389
+DOB: (withheld, synthetic)               Date Collected: 08/18/2026
+Sex: M                                   Date Received: 08/18/2026
+Ordering Provider: R. Kim, MD (NPI 4567890123)   Date Reported: 08/20/2026
+
+CLINICAL HISTORY:
+58-year-old male with a rapidly enlarging, irregularly pigmented lesion on
+the right upper back, clinically suspicious for melanoma.
+
+SPECIMEN(S) RECEIVED:
+A. Skin, right upper back, punch biopsy
+
+GROSS DESCRIPTION:
+Received in formalin labeled "A: skin, right upper back" is a single
+tan-brown punch biopsy specimen measuring 0.5 x 0.5 x 0.3 cm. The
+specimen is bisected and entirely submitted in one cassette (A1).
+
+MICROSCOPIC DESCRIPTION:
+Sections show an asymmetric, poorly circumscribed proliferation of
+atypical epithelioid and spindled melanocytes extending from the
+junctional zone into the reticular dermis, with scattered mitotic
+figures and focal pagetoid spread. There is no clear zone of
+maturation with descent toward the base of the lesion.
+
+IMMUNOHISTOCHEMISTRY:
+A four-antibody melanocytic panel was performed on block A1. S100 is
+diffusely and strongly positive throughout the atypical melanocytic
+population. SOX10 is positive, highlighting nuclear staining in the
+same population. Melan-A is positive, confirming melanocytic
+differentiation. HMB-45 is positive throughout the lesion, without the
+loss of expression toward the base that would be expected in a benign
+nevus.
+
+DIAGNOSIS:
+A. Skin, right upper back, punch biopsy:
+   - Malignant melanoma, at least 1.2 mm in measured depth (see comment).
+
+COMMENT:
+The immunohistochemical profile (S100+, SOX10+, Melan-A+, HMB-45+ without
+maturation) supports the diagnosis of malignant melanoma over a benign
+melanocytic proliferation. Please correlate clinically for staging.

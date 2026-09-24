@@ -1,0 +1,109 @@
+[
+  {
+    "fact_id": "f1-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "skin, right upper back"
+      ],
+      "container_label": "A: skin, right upper back"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 511,
+      "end": 550,
+      "quoted": "A. Skin, right upper back, punch biopsy"
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f2-stain-s100",
+    "fact_type": "stain",
+    "value": {
+      "kind": "ihc",
+      "block_id": "A1",
+      "stain_id": "A1-IHC-1",
+      "antibody": "S100"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1196,
+      "end": 1283,
+      "quoted": "S100 is\ndiffusely and strongly positive throughout the atypical melanocytic\npopulation."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f3-stain-sox10",
+    "fact_type": "stain",
+    "value": {
+      "kind": "ihc",
+      "block_id": "A1",
+      "stain_id": "A1-IHC-2",
+      "antibody": "SOX10"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1284,
+      "end": 1356,
+      "quoted": "SOX10 is positive, highlighting nuclear staining in the\nsame population."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f4-stain-melana",
+    "fact_type": "stain",
+    "value": {
+      "kind": "ihc",
+      "block_id": "A1",
+      "stain_id": "A1-IHC-3",
+      "antibody": "Melan-A"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1357,
+      "end": 1417,
+      "quoted": "Melan-A is positive, confirming melanocytic\ndifferentiation."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f5-stain-hmb45",
+    "fact_type": "stain",
+    "value": {
+      "kind": "ihc",
+      "block_id": "A1",
+      "stain_id": "A1-IHC-4",
+      "antibody": "HMB-45"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1418,
+      "end": 1548,
+      "quoted": "HMB-45 is positive throughout the lesion, without the\nloss of expression toward the base that would be expected in a benign\nnevus."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f6-dx",
+    "fact_type": "diagnosis",
+    "value": {
+      "text": "malignant melanoma",
+      "certainty": "definitive",
+      "qualifier": null
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1607,
+      "end": 1675,
+      "quoted": "Malignant melanoma, at least 1.2 mm in measured depth (see comment)."
+    },
+    "confidence": "high"
+  }
+]

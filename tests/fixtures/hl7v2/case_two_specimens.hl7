@@ -1,0 +1,10 @@
+MSH|^~\&|LIS|SYNTHLAB|RECV|RECV|20260115103000||ORU^R01|MSG00001|P|2.5.1
+PID|1||ANON00001||TEST^SYNTHETIC||19800101|U
+OBR|1|ORD0001|S26-0042760|88305^Surgical Pathology^CPT|||20260115103000||||||Rule out malignancy|||1234567890^Smith^Jane^^^^^^^^^^NPI
+SPM|1|S26-0042760&A||TISS^Tissue^HL70487||||71854001^Skin of left forearm^SCT
+SPM|2|S26-0042760&B||TISS^Tissue^HL70487||||76752008^Skin of right shoulder^SCT
+OBX|1|TX|CLINHX^Clinical History^L||Rash on bilateral upper extremities.||||||F
+OBX|2|TX|GROSS^Gross Description^L||Received in formalin, two specimens labeled A and B.||||||F
+OBX|3|TX|MICRO^Microscopic Description^L||Sections show compound melanocytic proliferation.||||||F
+OBX|4|TX|DX^Diagnosis^L||A. Skin, left forearm: compound nevus.||||||F
+OBX|5|TX|DX^Diagnosis^L||B. Skin, right shoulder: compound nevus.||||||F

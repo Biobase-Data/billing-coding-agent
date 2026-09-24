@@ -1,0 +1,84 @@
+{
+  "case_id": "S26-0041955",
+  "lab_id": "LAB-DEMO-01",
+  "date_of_service": "2026-08-10",
+  "date_reported": "2026-08-12T11:05:00",
+  "subspecialty": "surgical",
+  "billing_arrangement": "global",
+  "specimens": [
+    {
+      "specimen_id": "A",
+      "site": "colon, ascending",
+      "procedure_type": "polypectomy",
+      "container_label": "A. Colon polyp, ascending colon",
+      "blocks": [{"block_id": "A1", "stains": [
+        {"stain_id": "A1-HE-1", "kind": "he", "ordered": true, "resulted": true, "performed_at": "2026-08-11T08:00:00"}
+      ]}],
+      "diagnoses": [{"text": "Tubular adenoma, low-grade dysplasia", "certainty": "definitive"}]
+    },
+    {
+      "specimen_id": "B",
+      "site": "colon, hepatic flexure",
+      "procedure_type": "polypectomy",
+      "container_label": "B. Colon polyp, hepatic flexure",
+      "blocks": [{"block_id": "B1", "stains": [
+        {"stain_id": "B1-HE-1", "kind": "he", "ordered": true, "resulted": true, "performed_at": "2026-08-11T08:00:00"}
+      ]}],
+      "diagnoses": [{"text": "Hyperplastic polyp", "certainty": "definitive"}]
+    },
+    {
+      "specimen_id": "C",
+      "site": "colon, transverse",
+      "procedure_type": "polypectomy",
+      "container_label": "C. Colon polyp, transverse colon",
+      "blocks": [{"block_id": "C1", "stains": [
+        {"stain_id": "C1-HE-1", "kind": "he", "ordered": true, "resulted": true, "performed_at": "2026-08-11T08:00:00"}
+      ]}],
+      "diagnoses": [{"text": "Tubular adenoma, low-grade dysplasia", "certainty": "definitive"}]
+    },
+    {
+      "specimen_id": "D",
+      "site": "colon, splenic flexure",
+      "procedure_type": "polypectomy",
+      "container_label": "D. Colon polyp, splenic flexure",
+      "blocks": [{"block_id": "D1", "stains": [
+        {"stain_id": "D1-HE-1", "kind": "he", "ordered": true, "resulted": true, "performed_at": "2026-08-11T08:00:00"}
+      ]}],
+      "diagnoses": [{"text": "Hyperplastic polyp", "certainty": "definitive"}]
+    },
+    {
+      "specimen_id": "E",
+      "site": "colon, sigmoid",
+      "procedure_type": "polypectomy",
+      "container_label": "E. Colon polyp, sigmoid colon",
+      "blocks": [{"block_id": "E1", "stains": [
+        {"stain_id": "E1-HE-1", "kind": "he", "ordered": true, "resulted": true, "performed_at": "2026-08-11T08:00:00"}
+      ]}],
+      "diagnoses": [{"text": "Tubulovillous adenoma, low-grade dysplasia", "certainty": "definitive"}]
+    },
+    {
+      "specimen_id": "F",
+      "site": "rectum",
+      "procedure_type": "polypectomy",
+      "container_label": "F. Colon polyp, rectum",
+      "blocks": [{"block_id": "F1", "stains": [
+        {"stain_id": "F1-HE-1", "kind": "he", "ordered": true, "resulted": true, "performed_at": "2026-08-11T08:00:00"}
+      ]}],
+      "diagnoses": [{"text": "Benign colonic mucosa, no diagnostic abnormality", "certainty": "definitive"}]
+    }
+  ],
+  "requisition": {
+    "clinical_indication": "Screening colonoscopy, family history of colorectal carcinoma, polypectomy x6.",
+    "ordering_provider_npi": "2345678901",
+    "tests_ordered": ["Surgical pathology consultation"],
+    "payer": {
+      "plan": "Demo Commercial PPO",
+      "mac_jurisdiction": "DEMO-MAC-J5",
+      "payer_class": "commercial"
+    }
+  },
+  "documents": [
+    {"document_id": "doc-report", "kind": "report", "file": "documents/report.txt", "received_at": "2026-08-12T11:05:00"},
+    {"document_id": "doc-requisition", "kind": "requisition", "file": "documents/requisition.txt", "received_at": "2026-08-10T09:00:00"}
+  ]
+}

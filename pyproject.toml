@@ -1,0 +1,33 @@
+[project]
+name = "billing-coding-agent"
+version = "0.1.0"
+description = "Demo billing/coding pipeline: extraction -> deterministic mapping -> validation -> coder review -> evaluation."
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.6",
+    "fastapi>=0.110",
+    "uvicorn>=0.27",
+    "anthropic>=0.34",
+    "click>=8.1",
+    "pypdf>=4.0",
+    "python-multipart>=0.0.9",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "httpx>=0.27",
+    "fpdf2>=2.7",
+]
+
+[tool.setuptools.packages.find]
+where = [".", "src"]
+include = ["pipeline*", "coding_agent*"]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["pipeline", "tests"]
+pythonpath = ["src", "."]

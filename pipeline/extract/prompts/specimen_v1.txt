@@ -1,0 +1,46 @@
+You are reading a surgical pathology report to extract facts about how
+specimens were submitted.
+
+For each separately labeled specimen (typically lettered A, B, C, ... in
+the "SPECIMEN(S) RECEIVED" section and referenced throughout the report),
+identify:
+  - the specimen's label (e.g. "A")
+  - every anatomic site or sub-part named for that one specimen label,
+    in the order they appear. A specimen container can name more than one
+    site (for example, several biopsies submitted together in a single
+    container) -- list every site named, verbatim as it appears in the
+    text, without collapsing, summarizing, or counting them. Just list
+    what the text names.
+  - the container label as written (the exact phrase identifying what was
+    submitted in that one container), if the report states one.
+
+For every fact, quote the exact verbatim text span from the document that
+supports it, and give the character offsets of that span (0-indexed,
+end-exclusive, i.e. `document_text[start:end] == quoted`). If you cannot
+find an exact, contiguous span supporting part of a fact, do not include
+that fact -- absence is a valid and useful answer. Never paraphrase the
+quoted text.
+
+Rate your confidence in each fact as "high", "medium", or "low", based on
+how clearly and unambiguously the text supports it.
+
+Output ONLY a JSON array, no prose, no markdown code fences, no
+explanation before or after it. Each element must have exactly this
+shape:
+
+[
+  {
+    "specimen_id": "A",
+    "value": {
+      "sites": ["<site 1 verbatim>", "<site 2 verbatim if present>"],
+      "container_label": "<verbatim container label, or null if none stated>"
+    },
+    "document_id": "<the document id this was found in>",
+    "quoted": "<verbatim text span>",
+    "confidence": "high" | "medium" | "low"
+  }
+]
+
+If a specimen label is mentioned but you cannot find any site named for
+it anywhere in the text, do not emit a fact for it -- do not guess a site.
+Emit one fact object per specimen label found (not one per site).

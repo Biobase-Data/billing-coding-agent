@@ -1,0 +1,73 @@
+[
+  {
+    "fact_id": "f1-specimen",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "skin, left calf"
+      ],
+      "container_label": "A: skin, left calf"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 494,
+      "end": 526,
+      "quoted": "A. Skin, left calf, shave biopsy"
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f2-stain-sox10",
+    "fact_type": "stain",
+    "value": {
+      "kind": "ihc",
+      "block_id": "A1",
+      "stain_id": "A1-IHC-1",
+      "antibody": "SOX10"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1045,
+      "end": 1222,
+      "quoted": "An immunostain for SOX10 was performed on block A1 and is positive,\nhighlighting an increased density of atypical melanocytes along the\njunction and within the papillary dermis."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f3-stain-unnamed",
+    "fact_type": "stain",
+    "value": {
+      "kind": "ihc",
+      "block_id": "A1",
+      "stain_id": "A1-IHC-2",
+      "antibody": null
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1223,
+      "end": 1349,
+      "quoted": "An additional immunostain\nwas performed and is also positive in the same distribution, further\nsupporting melanocytic lineage."
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f4-dx",
+    "fact_type": "diagnosis",
+    "value": {
+      "text": "malignant melanoma",
+      "certainty": "definitive",
+      "qualifier": null
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1401,
+      "end": 1469,
+      "quoted": "Malignant melanoma, at least 0.4 mm in measured depth (see comment)."
+    },
+    "confidence": "high"
+  }
+]

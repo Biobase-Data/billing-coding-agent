@@ -1,0 +1,31 @@
+{
+  "case": {
+    "case_id": "eval-removal-001",
+    "accession_number": "S26-1002",
+    "date_of_service": "2026-03-05",
+    "source_format": "hl7v2",
+    "source_document_id": "S26-1002",
+    "specimens": {
+      "value": [
+        {"specimen_id": "A", "source_field": "SPM"},
+        {"specimen_id": "B", "source_field": "SPM"},
+        {"specimen_id": "C", "source_field": "SPM"}
+      ]
+    },
+    "narrative": [
+      {
+        "kind": "gross",
+        "text": {"value": "Received in formalin, three specimens labeled A, B, and a third specimen with a non-diagnostic label."}
+      },
+      {
+        "kind": "diagnosis",
+        "text": {"value": "A. Skin, left forearm: compound nevus.\nB. Skin, right shoulder: compound nevus."}
+      }
+    ],
+    "requisition": {"match_method": "accession_number"}
+  },
+  "model_response_text": "{\"abstain\": false, \"mentions\": [{\"label\": \"A\", \"section\": \"diagnosis\", \"quoted\": \"A. Skin, left forearm\"}, {\"label\": \"B\", \"section\": \"diagnosis\", \"quoted\": \"B. Skin, right shoulder\"}]}",
+  "expected_labels": ["A", "B"],
+  "primary_code": "88305",
+  "baseline": []
+}

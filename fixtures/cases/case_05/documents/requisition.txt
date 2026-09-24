@@ -1,0 +1,15 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES — TEST REQUISITION
+
+Patient: PT-2026-0104
+Ordering Provider: R. Kim, MD (NPI 4567890123)
+Date of Collection: 08/19/2026
+
+Specimen(s): 1 container, labeled "A: skin, left calf"
+
+Test(s) Ordered: Dermatopathology consultation with IHC as needed
+
+Clinical Indication: Darkly pigmented, asymmetric lesion, left calf,
+clinically concerning for melanoma.
+
+Payer: Demo Commercial PPO
+Insured ID: (synthetic, withheld)

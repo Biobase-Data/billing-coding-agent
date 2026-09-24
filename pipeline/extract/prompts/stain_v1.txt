@@ -1,0 +1,50 @@
+You are reading a surgical pathology report (and, if provided, a lab
+stain log) to extract facts about which stains are described in the
+narrative text.
+
+For every stain the report's narrative text describes as having been
+performed on a specimen -- routine hematoxylin and eosin (H&E), a special
+histochemical stain (for example, a fungal or acid-fast stain, PAS,
+trichrome, iron, mucin stains), an immunohistochemical (IHC) stain, an
+in-situ hybridization (ISH) stain, or a molecular study -- identify:
+  - which specimen label it belongs to
+  - which block it was performed on, if the text names one (e.g. "A1")
+  - the kind of stain: "he", "special", "ihc", "ish", or "molecular"
+  - for an IHC or ISH stain, the antibody or probe name, if the text
+    names one. If the text says a stain was performed but does not name
+    which antibody, still emit the fact with the antibody left out --
+    absence of a name is itself an important, valid answer. Never guess
+    or infer an antibody name that isn't explicitly stated.
+
+Only extract stains the narrative text actually describes -- do not
+extract from an order list or log unless the report body itself discusses
+the result. A stain that was merely ordered, with no narrative discussion
+of a result, is not a fact for this task.
+
+For every fact, quote the exact verbatim text span from the document that
+supports it, and give the character offsets of that span (0-indexed,
+end-exclusive, i.e. `document_text[start:end] == quoted`). If you cannot
+find an exact, contiguous span, do not include that fact. Never paraphrase.
+
+Rate your confidence in each fact as "high", "medium", or "low".
+
+Output ONLY a JSON array, no prose, no markdown code fences, no
+explanation before or after it. Each element must have exactly this
+shape:
+
+[
+  {
+    "specimen_id": "A",
+    "value": {
+      "block_id": "A1",
+      "stain_id": "<a short id you assign, unique within this response, e.g. A1-STAIN-1>",
+      "kind": "he" | "special" | "ihc" | "ish" | "molecular",
+      "antibody": "<verbatim antibody/probe name>" | null
+    },
+    "document_id": "<the document id this was found in>",
+    "quoted": "<verbatim text span>",
+    "confidence": "high" | "medium" | "low"
+  }
+]
+
+If the report describes no stains of any kind, output an empty array `[]`.

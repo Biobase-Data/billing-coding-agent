@@ -1,0 +1,17 @@
+{
+  "unreviewed": true,
+  "expected_lines": [
+    {"code": "88305", "code_system": "CPT", "units": 1, "modifiers": [], "specimen_id": "A"},
+    {"code": "88305", "code_system": "CPT", "units": 1, "modifiers": [], "specimen_id": "B"},
+    {"code": "88305", "code_system": "CPT", "units": 1, "modifiers": [], "specimen_id": "C"},
+    {"code": "88305", "code_system": "CPT", "units": 1, "modifiers": [], "specimen_id": "D"},
+    {"code": "88305", "code_system": "CPT", "units": 1, "modifiers": [], "specimen_id": "E"},
+    {"code": "88305", "code_system": "CPT", "units": 1, "modifiers": [], "specimen_id": "F"},
+    {"code": "D12.6", "code_system": "ICD10", "units": 1, "modifiers": [], "specimen_id": "A"},
+    {"code": "K63.5", "code_system": "ICD10", "units": 1, "modifiers": [], "specimen_id": "B"},
+    {"code": "D12.6", "code_system": "ICD10", "units": 1, "modifiers": [], "specimen_id": "C"},
+    {"code": "K63.5", "code_system": "ICD10", "units": 1, "modifiers": [], "specimen_id": "D"},
+    {"code": "D12.6", "code_system": "ICD10", "units": 1, "modifiers": [], "specimen_id": "E"}
+  ],
+  "expected_findings": []
+}

@@ -1,0 +1,15 @@
+.claude/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+.venv/
+venv/
+runs/*
+!runs/.gitkeep
+node_modules/
+ui/dist/
+ui/build/
+.env
+*.db
+.DS_Store

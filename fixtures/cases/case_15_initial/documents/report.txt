@@ -1,0 +1,34 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES
+Surgical Pathology Report
+
+Patient: PT-2026-0203                    Accession: S26-0042900
+Sex: M                                    Date Collected: 08/18/2026
+Ordering Provider: K. Nasser, MD (NPI 4567890123)   Date Reported: 08/20/2026
+
+CLINICAL HISTORY:
+38-year-old male with a changing pigmented lesion on the upper back,
+present for several months, referred for evaluation to rule out
+malignancy.
+
+SPECIMEN(S) RECEIVED:
+A. Skin, upper back, shave biopsy
+
+GROSS DESCRIPTION:
+Received in formalin labeled "A: skin, upper back" is a single tan-brown
+shave biopsy specimen measuring 0.5 x 0.4 x 0.2 cm. The specimen is
+bisected and entirely submitted in one cassette (A1).
+
+MICROSCOPIC DESCRIPTION:
+Sections of the shave biopsy demonstrate a well-circumscribed proliferation
+of nested melanocytes confined to the papillary dermis with maturation at
+the base. Hematoxylin and eosin stained sections show no significant
+cytologic atypia, no mitotic activity, and no evidence of pagetoid
+spread. The overlying epidermis is unremarkable.
+
+DIAGNOSIS:
+A. Skin, upper back, shave biopsy:
+   - Compound nevus.
+
+COMMENT:
+No additional special stains or immunohistochemistry were required for
+diagnosis.

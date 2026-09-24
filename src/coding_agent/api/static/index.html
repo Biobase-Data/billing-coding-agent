@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>coding_agent V0 test console</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg: #0e1117; --panel: #161b22; --border: #2a313c; --text: #e6edf3;
+    --muted: #8b949e; --addition: #3fb950; --removal: #f85149; --blocked: #d29922;
+    --accent: #58a6ff;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--text); }
+  header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex;
+    align-items: baseline; gap: 10px; }
+  header h1 { font-size: 16px; margin: 0; }
+  header span { color: var(--muted); font-size: 13px; }
+  .layout { display: grid; grid-template-columns: 260px 1fr; height: calc(100vh - 49px); }
+  nav { border-right: 1px solid var(--border); overflow-y: auto; padding: 10px; }
+  nav h2 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted);
+    margin: 14px 6px 6px; }
+  .case-btn { display: block; width: 100%; text-align: left; background: none; border: 1px solid transparent;
+    color: var(--text); padding: 8px 10px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+  .case-btn:hover { background: var(--panel); }
+  .case-btn.active { background: var(--panel); border-color: var(--accent); }
+  .case-btn .fmt { color: var(--muted); font-size: 11px; display: block; }
+  main { padding: 20px; overflow-y: auto; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+    padding: 16px; margin-bottom: 16px; }
+  .card h3 { margin: 0 0 10px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em;
+    color: var(--muted); }
+  pre { white-space: pre-wrap; font-size: 13px; margin: 0; line-height: 1.5; }
+  .section-name { color: var(--accent); font-size: 11px; text-transform: uppercase; margin-top: 10px; }
+  .specimens { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { border: 1px solid var(--border); border-radius: 999px; padding: 3px 10px; font-size: 12px; }
+  button.run { background: var(--accent); color: #04121f; border: none; border-radius: 6px;
+    padding: 8px 16px; font-weight: 600; cursor: pointer; font-size: 13px; }
+  button.run:disabled { opacity: 0.5; cursor: default; }
+  .line { border-left: 4px solid var(--border); padding: 10px 12px; margin-bottom: 10px; border-radius: 4px;
+    background: rgba(255,255,255,0.02); }
+  .line.addition { border-color: var(--addition); }
+  .line.removal { border-color: var(--removal); }
+  .line.change { border-color: var(--blocked); }
+  .line .kind { font-weight: 700; font-size: 12px; }
+  .line.addition .kind { color: var(--addition); }
+  .line.removal .kind { color: var(--removal); }
+  .line.change .kind { color: var(--blocked); }
+  .line .meta { color: var(--muted); font-size: 12px; margin: 4px 0; }
+  .line .rationale { font-size: 13px; margin: 6px 0; }
+  .quote { font-style: italic; color: var(--muted); font-size: 12px; border-left: 2px solid var(--border);
+    padding-left: 8px; margin: 4px 0; }
+  .actions button { margin-right: 6px; font-size: 12px; padding: 4px 10px; border-radius: 4px;
+    border: 1px solid var(--border); background: none; color: var(--text); cursor: pointer; }
+  .actions button:hover { background: var(--panel); }
+  .actions .recorded { color: var(--muted); font-size: 12px; }
+  .blocked-banner { border: 1px solid var(--blocked); color: var(--blocked); padding: 10px 14px;
+    border-radius: 6px; font-size: 13px; }
+  .stamp { color: var(--muted); font-size: 11px; display: flex; gap: 14px; flex-wrap: wrap; }
+  textarea { width: 100%; min-height: 140px; background: #0a0d12; color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px; padding: 8px; font-family: monospace; font-size: 12px; }
+  select, input[type=text] { background: #0a0d12; color: var(--text); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 8px; font-size: 13px; }
+  .row { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+  .empty { color: var(--muted); font-size: 13px; }
+  .error { color: var(--removal); font-size: 13px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>coding_agent V0 — test console</h1>
+  <span>specimen unit reconciliation, offline/retrospective</span>
+</header>
+<div class="layout">
+  <nav>
+    <h2>Sample corpus</h2>
+    <div id="case-list"></div>
+    <h2>Custom input</h2>
+    <button class="case-btn" id="custom-btn">Paste HL7 / FHIR text</button>
+    <button class="case-btn" id="pdf-btn">Upload PDF report</button>
+  </nav>
+  <main id="main">
+    <p class="empty">Pick a case on the left.</p>
+  </main>
+</div>
+
+<script>
+const state = { cases: [], selected: null, mode: null };
+
+function errorMessage(body, fallback) {
+  const detail = body && body.detail;
+  if (typeof detail === 'string' && detail) return detail;
+  if (Array.isArray(detail)) {
+    // FastAPI's own request validation (e.g. a missing required field)
+    // returns `detail` as a list of {loc, msg} objects, not a string.
+    return detail
+      .map((d) => (Array.isArray(d.loc) ? d.loc.join('.') + ': ' : '') + (d.msg || JSON.stringify(d)))
+      .join('; ');
+  }
+  return fallback;
+}
+
+async function api(path, opts) {
+  const res = await fetch(path, opts);
+  const body = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(errorMessage(body, res.statusText));
+  return body;
+}
+
+function el(tag, attrs, children) {
+  const node = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (k === 'class') node.className = v;
+    else if (k.startsWith('on')) node.addEventListener(k.slice(2), v);
+    else node.setAttribute(k, v);
+  }
+  for (const child of children || []) {
+    node.appendChild(typeof child === 'string' ? document.createTextNode(child) : child);
+  }
+  return node;
+}
+
+async function loadCases() {
+  state.cases = await api('/api/cases');
+  const list = document.getElementById('case-list');
+  list.innerHTML = '';
+  for (const c of state.cases) {
+    const btn = el('button', {
+      class: 'case-btn' + (state.selected === c.case_id && state.mode === 'sample' ? ' active' : ''),
+      onclick: () => selectCase(c.case_id),
+    }, [c.case_id, el('span', { class: 'fmt' }, [c.source_format + ' · ' + c.primary_code])]);
+    list.appendChild(btn);
+  }
+}
+
+document.getElementById('custom-btn').addEventListener('click', () => {
+  state.mode = 'custom';
+  state.selected = null;
+  renderCustomForm();
+  loadCases();
+});
+
+document.getElementById('pdf-btn').addEventListener('click', () => {
+  state.mode = 'pdf';
+  state.selected = null;
+  renderPdfForm();
+  loadCases();
+});
+
+async function selectCase(caseId) {
+  state.mode = 'sample';
+  state.selected = caseId;
+  await loadCases();
+  const main = document.getElementById('main');
+  main.innerHTML = '<p class="empty">Loading…</p>';
+  const detail = await api(`/api/cases/${caseId}`);
+  renderCaseDetail(detail, null);
+}
+
+function narrativeCard(caseObj) {
+  const card = el('div', { class: 'card' }, [el('h3', {}, ['Narrative'])]);
+  let any = false;
+  for (const section of caseObj.narrative) {
+    if (section.text && section.text.value != null) {
+      any = true;
+      card.appendChild(el('div', { class: 'section-name' }, [section.kind]));
+      card.appendChild(el('pre', {}, [section.text.value]));
+    }
+  }
+  if (!any) card.appendChild(el('p', { class: 'empty' }, ['No narrative text on this case.']));
+  return card;
+}
+
+function specimensCard(caseObj) {
+  const card = el('div', { class: 'card' }, [el('h3', {}, ['Accessioned specimens'])]);
+  if (caseObj.specimens && caseObj.specimens.value) {
+    const wrap = el('div', { class: 'specimens' });
+    for (const s of caseObj.specimens.value) wrap.appendChild(el('span', { class: 'chip' }, [s.specimen_id]));
+    card.appendChild(wrap);
+  } else {
+    card.appendChild(el('p', { class: 'empty' }, [
+      'Absent (' + (caseObj.specimens ? caseObj.specimens.absent : 'unknown') + ') — nothing to reconcile against.',
+    ]));
+  }
+  return card;
+}
+
+function recommendationCard(result, caseId) {
+  const card = el('div', { class: 'card' }, [el('h3', {}, ['Recommendation'])]);
+  const rec = result.recommendation;
+
+  card.appendChild(el('p', {}, [
+    'Extracted labels: ' + (result.actual_labels ? result.actual_labels.join(', ') : '— (abstained)'),
+  ]));
+
+  if (rec.blocked) {
+    card.appendChild(el('div', { class: 'blocked-banner' }, [
+      rec.blocked.reason + ': ' + rec.blocked.detail,
+    ]));
+  } else if (rec.lines.length === 0) {
+    card.appendChild(el('p', { class: 'empty' }, ['No findings — narrative and accessioning agree.']));
+  } else {
+    rec.lines.forEach((line, idx) => card.appendChild(lineCard(line, idx, caseId)));
+  }
+
+  const stamp = result.audited.version_stamp;
+  card.appendChild(el('div', { class: 'stamp' }, [
+    el('span', {}, ['pipeline ' + stamp.pipeline_version]),
+    el('span', {}, ['model ' + stamp.model_version]),
+    el('span', {}, ['prompt ' + stamp.prompt_version]),
+    el('span', {}, ['rules ' + stamp.rules_version]),
+    el('span', {}, ['code-set ' + stamp.code_set_year]),
+  ]));
+  return card;
+}
+
+function cptLevelCard(result) {
+  const card = el('div', { class: 'card' }, [el('h3', {}, ['CPT Level Recommendation'])]);
+  const cpt = result.cpt_level;
+
+  if (cpt.blocked) {
+    card.appendChild(el('div', { class: 'blocked-banner' }, [
+      cpt.blocked.reason + ': ' + cpt.blocked.detail,
+    ]));
+  } else if (cpt.findings.length === 0 && cpt.unaddressed_specimen_ids.length === 0) {
+    card.appendChild(el('p', { class: 'empty' }, [
+      'No findings — every specimen’s recommended level matches its baseline.',
+    ]));
+  } else {
+    cpt.findings.forEach((finding) => card.appendChild(cptFindingCard(finding)));
+    if (cpt.unaddressed_specimen_ids.length > 0) {
+      card.appendChild(el('p', { class: 'empty' }, [
+        'Not addressed (no procedure type identified, or an unmapped procedure-type/site '
+          + 'combination): ' + cpt.unaddressed_specimen_ids.join(', '),
+      ]));
+    }
+  }
+
+  const stamp = result.cpt_level_audited.version_stamp;
+  card.appendChild(el('div', { class: 'stamp' }, [
+    el('span', {}, ['pipeline ' + stamp.pipeline_version]),
+    el('span', {}, ['model ' + stamp.model_version]),
+    el('span', {}, ['prompt ' + stamp.prompt_version]),
+    el('span', {}, ['rules ' + stamp.rules_version]),
+    el('span', {}, ['code-set ' + stamp.code_set_year]),
+  ]));
+  return card;
+}
+
+function cptFindingCard(finding) {
+  const isAddition = finding.baseline_code === null;
+  const wrap = el('div', { class: 'line ' + (isAddition ? 'addition' : 'change') });
+  wrap.appendChild(el('span', { class: 'kind' }, [
+    (isAddition ? 'ADDITION' : 'CHANGE') + ' — specimen ' + finding.specimen_id,
+  ]));
+  wrap.appendChild(el('div', { class: 'meta' }, [
+    'recommended ' + finding.recommended_code
+      + (isAddition ? ' · no baseline code found' : ' · baseline was ' + finding.baseline_code),
+  ]));
+  wrap.appendChild(el('div', { class: 'rationale' }, [finding.rationale]));
+  for (const ev of finding.evidence) {
+    wrap.appendChild(el('div', { class: 'quote' }, ['"' + ev.quoted + '" (' + ev.section + ')']));
+  }
+  return wrap;
+}
+
+function lineCard(line, idx, caseId) {
+  const wrap = el('div', { class: 'line ' + line.diff_kind });
+  wrap.appendChild(el('span', { class: 'kind' }, [line.diff_kind.toUpperCase() + ' — specimen ' + line.specimen_id]));
+  wrap.appendChild(el('div', { class: 'rationale' }, [line.rationale]));
+  for (const ev of line.evidence) {
+    wrap.appendChild(el('div', { class: 'quote' }, ['"' + ev.quoted + '" (' + ev.section + ')']));
+  }
+  if (caseId) {
+    const actionsDiv = el('div', { class: 'actions' });
+    for (const action of ['accepted', 'edited', 'removed']) {
+      actionsDiv.appendChild(el('button', {
+        onclick: async () => {
+          let reason = null;
+          if (action !== 'accepted') reason = prompt('Reason for ' + action + ':') || '';
+          try {
+            await api(`/api/cases/${caseId}/actions`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ line_index: idx, action, reason: reason || null }),
+            });
+            actionsDiv.appendChild(el('span', { class: 'recorded' }, [' recorded: ' + action]));
+          } catch (e) {
+            actionsDiv.appendChild(el('span', { class: 'error' }, [' ' + e.message]));
+          }
+        },
+      }, [action]));
+    }
+    wrap.appendChild(actionsDiv);
+  }
+  return wrap;
+}
+
+function renderCaseDetail(detail, result) {
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  main.appendChild(el('div', { class: 'row' }, [
+    el('strong', {}, [detail.case_id]),
+    el('span', { class: 'empty' }, [' primary code ' + detail.primary_code]),
+  ]));
+  main.appendChild(specimensCard(detail.case));
+  main.appendChild(narrativeCard(detail.case));
+
+  const runBtn = el('button', { class: 'run' }, [result ? 'Re-run' : 'Run pipeline']);
+  runBtn.addEventListener('click', async () => {
+    runBtn.disabled = true;
+    runBtn.textContent = 'Running…';
+    try {
+      const r = await api(`/api/cases/${detail.case_id}/run`, { method: 'POST' });
+      renderCaseDetail(detail, r);
+    } catch (e) {
+      alert(e.message);
+      runBtn.disabled = false;
+      runBtn.textContent = 'Run pipeline';
+    }
+  });
+  main.appendChild(el('div', { class: 'row' }, [runBtn]));
+
+  if (result) main.appendChild(recommendationCard(result, detail.case_id));
+}
+
+function renderCustomForm() {
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  const card = el('div', { class: 'card' }, [el('h3', {}, ['Custom HL7v2 / FHIR input (live model call)'])]);
+
+  const fmtSelect = el('select', {}, [
+    el('option', { value: 'hl7v2' }, ['HL7v2 ORU^R01']),
+    el('option', { value: 'fhir_r4' }, ['FHIR R4 Bundle (JSON)']),
+  ]);
+  const codeInput = el('input', { type: 'text', placeholder: 'primary code, e.g. 88305', value: '88305' });
+  const textarea = el('textarea', { placeholder: 'Paste raw HL7v2 message or FHIR Bundle JSON here…' });
+
+  card.appendChild(el('div', { class: 'row' }, [fmtSelect, codeInput]));
+  card.appendChild(textarea);
+
+  const runBtn = el('button', { class: 'run' }, ['Run (requires a live model key)']);
+  const resultHolder = el('div', {});
+  runBtn.addEventListener('click', async () => {
+    if (!textarea.value.trim() || !codeInput.value) {
+      alert('Paste HL7v2/FHIR text and a primary code first.');
+      return;
+    }
+    runBtn.disabled = true;
+    runBtn.textContent = 'Running…';
+    resultHolder.innerHTML = '';
+    try {
+      const r = await api('/api/custom/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          source_format: fmtSelect.value,
+          raw_text: textarea.value,
+          primary_code: codeInput.value,
+        }),
+      });
+      resultHolder.appendChild(specimensCard(r.case));
+      resultHolder.appendChild(narrativeCard(r.case));
+      resultHolder.appendChild(recommendationCard(r, null));
+      resultHolder.appendChild(cptLevelCard(r));
+    } catch (e) {
+      resultHolder.appendChild(el('p', { class: 'error' }, [e.message]));
+    }
+    runBtn.disabled = false;
+    runBtn.textContent = 'Run (requires a live model key)';
+  });
+
+  main.appendChild(card);
+  main.appendChild(el('div', { class: 'row' }, [runBtn]));
+  main.appendChild(resultHolder);
+}
+
+function renderPdfForm() {
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  const card = el('div', { class: 'card' }, [
+    el('h3', {}, ['Upload signed-out report PDF (live model call)']),
+    el('p', { class: 'empty' }, [
+      'A bare PDF has no structured accessioning specimen list, so reconciliation ',
+      'will report "blocked" here — this is expected, not an error. You will still ',
+      'see what specimen labels the narrative itself names.',
+    ]),
+  ]);
+
+  const fileInput = el('input', { type: 'file', accept: 'application/pdf' });
+  const accessionInput = el('input', { type: 'text', placeholder: 'accession number, e.g. S26-0099001' });
+  const dateInput = el('input', { type: 'date' });
+  const codeInput = el('input', { type: 'text', placeholder: 'primary code, e.g. 88305', value: '88305' });
+
+  card.appendChild(el('div', { class: 'row' }, [fileInput]));
+  card.appendChild(el('div', { class: 'row' }, [accessionInput, dateInput, codeInput]));
+
+  const runBtn = el('button', { class: 'run' }, ['Run (requires a live model key)']);
+  const resultHolder = el('div', {});
+  runBtn.addEventListener('click', async () => {
+    if (!fileInput.files[0]) { alert('Choose a PDF file first.'); return; }
+    if (!accessionInput.value || !dateInput.value || !codeInput.value) {
+      alert('Accession number, date of service, and primary code are all required.');
+      return;
+    }
+
+    runBtn.disabled = true;
+    runBtn.textContent = 'Running…';
+    resultHolder.innerHTML = '';
+    try {
+      const form = new FormData();
+      form.append('file', fileInput.files[0]);
+      form.append('accession_number', accessionInput.value);
+      form.append('date_of_service', dateInput.value);
+      form.append('primary_code', codeInput.value);
+
+      const res = await fetch('/api/custom/pdf-run', { method: 'POST', body: form });
+      const r = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(errorMessage(r, res.statusText));
+
+      resultHolder.appendChild(specimensCard(r.case));
+      resultHolder.appendChild(narrativeCard(r.case));
+      resultHolder.appendChild(recommendationCard(r, null));
+      resultHolder.appendChild(cptLevelCard(r));
+    } catch (e) {
+      resultHolder.appendChild(el('p', { class: 'error' }, [e.message]));
+    }
+    runBtn.disabled = false;
+    runBtn.textContent = 'Run (requires a live model key)';
+  });
+
+  main.appendChild(card);
+  main.appendChild(el('div', { class: 'row' }, [runBtn]));
+  main.appendChild(resultHolder);
+}
+
+loadCases();
+</script>
+</body>
+</html>

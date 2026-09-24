@@ -1,0 +1,37 @@
+[
+  {
+    "fact_id": "f1",
+    "fact_type": "specimen",
+    "value": {
+      "sites": [
+        "skin, upper back"
+      ],
+      "container_label": "A: skin, upper back"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 792,
+      "end": 825,
+      "quoted": "A. Skin, upper back, shave biopsy"
+    },
+    "confidence": "high"
+  },
+  {
+    "fact_id": "f2",
+    "fact_type": "diagnosis",
+    "value": {
+      "text": "atypical melanocytic proliferation",
+      "certainty": "qualified",
+      "qualifier": "cannot exclude melanoma in situ"
+    },
+    "specimen_id": "A",
+    "evidence": {
+      "document_id": "doc-report",
+      "start": 1383,
+      "end": 1451,
+      "quoted": "Atypical melanocytic proliferation, cannot exclude melanoma in situ."
+    },
+    "confidence": "high"
+  }
+]

@@ -1,0 +1,41 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES
+Surgical Pathology Report
+
+Patient: PT-2026-0158                    Accession: S26-0042110
+Sex: F                                    Date Collected: 08/14/2026
+Ordering Provider: L. Martins, MD (NPI 3456789012)  Date Reported: 08/16/2026
+
+CLINICAL HISTORY:
+52-year-old female with a several-year history of actinic damage, multiple
+clinically suspicious keratotic lesions sampled in one visit.
+
+SPECIMEN(S) RECEIVED:
+A. Skin, received in a single container labeled "shave biopsies x3: left
+   cheek, right cheek, and forehead"
+
+GROSS DESCRIPTION:
+Received in formalin in one container labeled as above are three tan-brown
+shave biopsy fragments, unoriented and not individually identified by the
+submitting clinician beyond the container label. The largest measures 0.5
+cm, the smallest 0.3 cm in greatest dimension. All three fragments are
+submitted together in a single cassette (A1).
+
+MICROSCOPIC DESCRIPTION:
+Sections of cassette A1 show three separate fragments of skin. Two
+fragments demonstrate hyperkeratosis with parakeratosis and disordered
+keratinocyte maturation consistent with actinic keratosis. The third
+fragment shows a seborrheic keratosis with hyperkeratosis and
+papillomatosis. Because the three fragments arrived in a single,
+unseparated container, they cannot be attributed to left cheek, right
+cheek, or forehead individually on histologic grounds alone.
+
+DIAGNOSIS:
+A. Skin, left cheek / right cheek / forehead (single container, three
+   fragments, submitted together):
+   - Actinic keratosis, two fragments.
+   - Seborrheic keratosis, one fragment.
+
+COMMENT:
+The submitting clinician combined three anatomically distinct biopsies in
+one container rather than three separate containers. Site-specific
+attribution of each fragment is not possible from this specimen alone.

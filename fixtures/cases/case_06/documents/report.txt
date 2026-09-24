@@ -1,0 +1,35 @@
+DEMO REGIONAL PATHOLOGY ASSOCIATES
+Surgical Pathology Report
+
+Patient: PT-2026-0118                    Accession: S26-0042460
+DOB: (withheld, synthetic)               Date Collected: 08/20/2026
+Sex: M                                   Date Received: 08/20/2026
+Ordering Provider: L. Ferreira, MD (NPI 5678901234)   Date Reported: 08/22/2026
+
+CLINICAL HISTORY:
+52-year-old male with a scaly, hyperkeratotic plaque on the right lower
+leg, clinical differential includes actinic keratosis versus tinea
+corporis; biopsy submitted with a request to rule out fungal infection.
+
+SPECIMEN(S) RECEIVED:
+A. Skin, right lower leg, shave biopsy
+
+GROSS DESCRIPTION:
+Received in formalin labeled "A: skin, right lower leg" is a single
+tan, scaly shave biopsy specimen measuring 0.7 x 0.5 x 0.2 cm. The
+specimen is bisected and entirely submitted in one cassette (A1).
+
+MICROSCOPIC DESCRIPTION:
+Sections show hyperkeratosis with parakeratosis, alternating with
+orthokeratosis, overlying a proliferation of basaloid keratinocytes
+with scattered atypia confined to the lower epidermis. There is
+mild solar elastosis in the underlying dermis. No fungal hyphae or
+spores are identified on the routine hematoxylin and eosin sections.
+
+DIAGNOSIS:
+A. Skin, right lower leg, shave biopsy:
+   - Actinic keratosis.
+
+COMMENT:
+The histologic features are those of actinic keratosis. No evidence of
+invasive carcinoma is identified in this specimen.
