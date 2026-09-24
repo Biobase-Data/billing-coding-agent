@@ -32,7 +32,7 @@ PROMPTS_DIR = Path(__file__).with_name("prompts")
 PROMPT_FILE = "specimens_v1.txt"
 PROMPT_VERSION = "specimens_v1"
 DEFAULT_MODEL = "claude-sonnet-5"
-GROQ_DEFAULT_MODEL = "llama-3.1-8b-instant"
+GROQ_DEFAULT_MODEL = "openai/gpt-oss-20b"
 GROK_DEFAULT_MODEL = "grok-4"
 MAX_TOKENS = 4096
 

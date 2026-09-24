@@ -114,10 +114,14 @@ just picks whichever is set, in this order):
 - `ANTHROPIC_API_KEY` — this project's default, `claude-sonnet-5`.
 - `GROQ_API_KEY` — a free-tier alternative hosting open-source models
   (get one at [console.groq.com](https://console.groq.com)), useful for
-  testing without any Anthropic spend. Defaults to
-  `llama-3.1-8b-instant`. Not to be confused with the next one —
-  "Groq" (the inference host) and "Grok" (xAI's model) are easy to mix
-  up but are different services with different keys.
+  testing without any Anthropic spend. Defaults to `openai/gpt-oss-20b`.
+  Which models a given Groq account can use varies (verified against a
+  real account: no Llama chat models at all, only OpenAI OSS/Qwen/a few
+  others — see `GET /openai/v1/models` with your own key), so if the
+  default 404s as `model_not_found`, list your account's actual models
+  and set `GROQ_MODEL` to one of them. Not to be confused with the next
+  one — "Groq" (the inference host) and "Grok" (xAI's model) are easy
+  to mix up but are different services with different keys.
 - `XAI_API_KEY` — xAI's Grok API (api.x.ai), a paid/metered API like
   Anthropic's, not a free tier. Defaults to `grok-4`.
 

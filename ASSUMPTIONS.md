@@ -216,9 +216,20 @@ above:
    - Past that block, Groq then returned `404: model_not_found` for
      `GROQ_DEFAULT_MODEL`'s original value (`llama-3.3-70b-versatile`)
      -- exactly the "Groq's catalog changes faster" risk this note
-     already predicted, playing out within the same session. Fixed the
-     default to `llama-3.1-8b-instant` (Groq's smallest/most
-     universally-available model, the safest bet against future churn)
-     and added `ANTHROPIC_MODEL`/`GROQ_MODEL`/`XAI_MODEL` env var
-     overrides in `_resolve_live_client()`, so the next catalog change
-     doesn't require waiting on a code change to unblock testing.
+     already predicted, playing out within the same session. Guessed a
+     second default (`llama-3.1-8b-instant`, usually Groq's most
+     universally-available model) that *also* 404'd, which is what
+     motivated adding `ANTHROPIC_MODEL`/`GROQ_MODEL`/`XAI_MODEL` env var
+     overrides in `_resolve_live_client()` rather than guessing a third
+     time -- the actual fix was to have the real account list its own
+     models via `GET /openai/v1/models`, which turned up something not
+     assumed going in: **this account has no Llama chat models at all**
+     (only OpenAI OSS models, Qwen, a couple of small/regional ones, plus
+     Whisper for audio and Orpheus for speech synthesis, neither
+     relevant here). `GROQ_DEFAULT_MODEL` is now `openai/gpt-oss-20b`,
+     confirmed present in that real listing (text-only, `json_mode`
+     support, 131k context) -- but which models exist on a *different*
+     Groq account is still not something this codebase can assume; the
+     env var override exists precisely because this catalog is per-
+     account, not just per-provider-and-changing-over-time as first
+     assumed.
