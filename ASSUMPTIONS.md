@@ -199,5 +199,15 @@ above:
    each provider's documented request/response shape) but their live
    verification happens on whoever actually runs the server with a real
    key, not here.
-   endpoint were reachable; xAI's was not), so live verification of this
-   one backend happens on whoever runs the server locally, not here.
+
+   That gap showed up in practice: a real Groq key returned `403: error
+   code 1010` on the first live try, which is Cloudflare's own bot-
+   signature block (Groq's API sits behind Cloudflare), not an error
+   from Groq's application at all -- caused by `urllib`'s default
+   User-Agent (`Python-urllib/3.x`), which such WAFs commonly
+   fingerprint and reject outright. `_call_openai_compatible_chat` now
+   sends an explicit `User-Agent` header for this reason. xAI's key
+   didn't trip the same block (it returned a proper JSON
+   `permission-denied` from xAI's own application layer), so this is
+   apparently Groq-specific WAF behavior, but the fix applies to both
+   clients since they share the one HTTP helper.

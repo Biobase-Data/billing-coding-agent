@@ -138,6 +138,13 @@ def _call_openai_compatible_chat(
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
+            # urllib's default User-Agent ("Python-urllib/3.x") gets
+            # blocked outright by Cloudflare-fronted APIs (a bare "403:
+            # error code 1010" -- Cloudflare's own bot-signature block,
+            # not an error from the provider's application at all).
+            # Anything that doesn't look like a bare stdlib client
+            # avoids it.
+            "User-Agent": "coding-agent-v0/1.0 (+https://github.com/Biobase-Data/billing-coding-agent)",
         },
     )
     try:

@@ -203,6 +203,10 @@ class TestGroqClient:
         request = mock_urlopen.call_args[0][0]
         assert request.full_url == "https://api.groq.com/openai/v1/chat/completions"
         assert request.get_header("Authorization") == "Bearer test-groq-key"
+        # A bare stdlib User-Agent ("Python-urllib/3.x") gets blocked
+        # outright by Cloudflare-fronted APIs like Groq's -- regression
+        # coverage for a real "403: error code 1010" hit in testing.
+        assert "python-urllib" not in request.get_header("User-agent").lower()
         sent_body = json.loads(request.data)
         assert sent_body["model"] == "llama-3.3-70b-versatile"
         assert sent_body["messages"] == [{"role": "user", "content": "hello"}]
