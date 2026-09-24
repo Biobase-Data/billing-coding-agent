@@ -353,4 +353,92 @@ above:
     do. Not yet re-verified against a real model call from this build
     environment (same network-access caveat as every other live-model
     claim in this document) -- the next live PDF run against this exact
-    report is the actual regression test for this fix.
+    report is the actual regression test for this fix. It was verified
+    live: the re-run correctly abstained (`ambiguous_narrative`, "the
+    narrative only references cassette identifiers and a descriptive
+    label, not a specimen-level identifier") instead of reporting seven
+    phantom specimens.
+
+14. **A raw billed-code stamp was leaking into the model's prompt --
+    found by noticing it printed inside the GROSS section in the test
+    console, on the same live PDF as #13.** The text right after
+    "cassettes A1-A7" read "Regional Pathology Associates 88304(1)":
+    a CPT code with a unit count, stamped directly onto the report with
+    no "CPT CODE(S):" label at all. `normalize/free_text.py` already
+    strips a *labeled* code line (`cpt code\(s\)\s*:`), but this
+    unlabeled, raw form matched no existing boilerplate pattern, so it
+    rode straight into the narrative text both extraction prompts
+    receive. This is a real breach of the stated invariant that
+    extract/ never sees a billing code -- not a hypothetical one, an
+    actual live one, sitting in a prompt.
+
+    Fixed by adding a targeted pattern, `\b\d{5}\(\d+\)`, to
+    `_BOILERPLATE_LINE_PATTERNS` -- a 5-digit code immediately followed
+    by a parenthesized count is distinctive enough (real narrative
+    prose does not produce that shape) to strip with the same
+    high-precision, allowlist-only posture as every other boilerplate
+    pattern in this module. Covered by two new tests: one against the
+    exact real line from #13's report, one against a multi-code stamp
+    line ("88307(1), 88309(1), 88342(3), 88341(21)") seen on a second
+    live PDF the same day.
+
+15. **A different, more serious variant of the same class of bug:
+    unrecognized section headers were silently discarding a real
+    specimen label and an entire final diagnosis, not just noise.**
+    Follows from the same-day finding above (`BC19-00056.redacted.pdf`)
+    that a live narrative came back as almost nothing -- that report's
+    actual extracted text was unavailable from this build environment
+    at the time, so it was left open rather than guessed at.
+
+    A second real report (uploaded directly to this session,
+    `sample_surgical_pathology_report.pdf`) made the same failure mode
+    reproducible with the actual source text in hand. Its real content
+    included `SPECIMEN RECEIVED` / `Specimen A: Left forearm lesion`
+    and a full `FINAL PATHOLOGIC DIAGNOSIS` (malignant melanoma, with
+    Breslow thickness, Clark level, and margins) -- none of which
+    appeared anywhere in the narrative the test console showed. Cause:
+    `split_sections`' header matching requires an *exact* full-line
+    match against `_HEADER_TO_NARRATIVE_KIND`, and this report used
+    realistic but slightly different header wording ("SPECIMEN
+    RECEIVED" vs. the recognized "SPECIMEN"; "CLINICAL HISTORY /
+    PRE-OPERATIVE DIAGNOSIS" vs. "CLINICAL HISTORY"; "FINAL PATHOLOGIC
+    DIAGNOSIS" vs. "PATHOLOGIC DIAGNOSIS"). An unrecognized header line
+    is folded into whichever section is "currently open" -- but nothing
+    was open yet (no header had matched), so the header line and every
+    line after it, up to the next *recognized* header, was silently
+    dropped. Not stripped as boilerplate; just gone, with no signal
+    anywhere that it happened.
+
+    This is worse than #13/#14: those produced a wrong-but-visible
+    extraction. This one produced a correct-looking abstention
+    ("no distinct specimen labels given") over an invisibly mutilated
+    input -- exactly the "silent normalization degradation" failure
+    mode the strategy doc names as one that "will be found late unless
+    instrumented." It was found this time only because the actual PDF
+    was available to diff against the rendered narrative by hand.
+
+    Fixed by adding the three concretely-observed header variants to
+    `_HEADER_TO_NARRATIVE_KIND` (`"CLINICAL HISTORY / PRE-OPERATIVE
+    DIAGNOSIS"`, `"SPECIMEN RECEIVED"`/`"SPECIMEN(S) RECEIVED"`/
+    `"SPECIMENS RECEIVED"`, `"FINAL PATHOLOGIC DIAGNOSIS"`/`"FINAL
+    PATHOLOGICAL DIAGNOSIS"`) -- the same narrow, evidence-based
+    allowlist growth this module's docstring already describes as its
+    maintenance model, not a change of approach. Also added boilerplate
+    patterns for the signing pathologist's name/credential line and the
+    disclaimer that followed it in this same report, which were
+    leaking into `MICROSCOPIC` (lower-severity noise, not a silent
+    drop). Covered by four new tests reproducing this exact report's
+    text verbatim.
+
+    Still unresolved, and worth being explicit about: this fix closes
+    the two concrete variants found so far, not the general problem.
+    The header list remains a finite allowlist against an unbounded
+    space of real report formats -- every LIS/lab template not yet seen
+    can silently drop content the same way, with no error and no log
+    line marking that it happened. There is no monitoring today that
+    would catch this other than a human comparing the source PDF to
+    the rendered narrative by hand, which does not scale past a demo.
+    Instrumenting this (at minimum: surfacing when text was dropped
+    because no section was open, distinct from the already-correct
+    "this section was never present" case) is real, undone work, not
+    something to treat as covered by the fixes above.

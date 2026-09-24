@@ -52,11 +52,15 @@ from .case import (
 
 _HEADER_TO_NARRATIVE_KIND: dict[str, NarrativeKind] = {
     "CLINICAL HISTORY": NarrativeKind.CLINICAL_HISTORY,
+    "CLINICAL HISTORY / PRE-OPERATIVE DIAGNOSIS": NarrativeKind.CLINICAL_HISTORY,
     "CLINICAL INDICATION": NarrativeKind.CLINICAL_HISTORY,
     "HISTORY": NarrativeKind.CLINICAL_HISTORY,
     "GROSS DESCRIPTION": NarrativeKind.GROSS,
     "GROSS": NarrativeKind.GROSS,
     "SPECIMEN": NarrativeKind.GROSS,
+    "SPECIMEN RECEIVED": NarrativeKind.GROSS,
+    "SPECIMEN(S) RECEIVED": NarrativeKind.GROSS,
+    "SPECIMENS RECEIVED": NarrativeKind.GROSS,
     "MICROSCOPIC DESCRIPTION": NarrativeKind.MICROSCOPIC,
     "MICROSCOPIC EXAMINATION": NarrativeKind.MICROSCOPIC,
     "MICROSCOPIC": NarrativeKind.MICROSCOPIC,
@@ -64,6 +68,8 @@ _HEADER_TO_NARRATIVE_KIND: dict[str, NarrativeKind] = {
     "FINAL DIAGNOSIS": NarrativeKind.DIAGNOSIS,
     "PATHOLOGIC DIAGNOSIS": NarrativeKind.DIAGNOSIS,
     "PATHOLOGICAL DIAGNOSIS": NarrativeKind.DIAGNOSIS,
+    "FINAL PATHOLOGIC DIAGNOSIS": NarrativeKind.DIAGNOSIS,
+    "FINAL PATHOLOGICAL DIAGNOSIS": NarrativeKind.DIAGNOSIS,
 }
 
 # A line consisting only of a known header, optionally followed by ':' and
@@ -88,6 +94,16 @@ _BOILERPLATE_LINE_PATTERNS = [
         r"proceed to next page",
         r"cpt code\(s\)\s*:",
         r"icd-?10 code\(s\)\s*:",
+        # A raw billed-code-with-unit-count stamp (e.g. "88304(1)",
+        # "88307(1), 88309(1)") -- some LIS report exports print this
+        # directly after the gross description with no "CPT CODE(S):"
+        # label at all. This is exactly the kind of content extract/
+        # must never see (see this module's and specimens.py's "never
+        # mentions billing... to the model" invariant): stripping the
+        # labeled form above but not this raw form was a real, live gap
+        # -- found by a coder feeding this exact PDF through the console
+        # and noticing the code stamp printed inside the GROSS section.
+        r"\b\d{5}\(\d+\)",
         r"^page\s+\d+\s+of\s+\d+\s*$",
         r"clia\s*#",
         r"screening location\s*:",
@@ -103,6 +119,17 @@ _BOILERPLATE_LINE_PATTERNS = [
         r"^\d{4}$",  # a bare 4-digit year with nothing else -- a page/table
         # extraction artifact; real narrative sentences never consist of
         # just a year.
+        # A signing pathologist's name/credential/sign-off line, and the
+        # boilerplate disclaimer that follows it -- these consistently
+        # trail the microscopic description in a real signed-out PDF's
+        # flattened text (the "electronically signed" label line above
+        # is already caught; these are the lines that follow it, found
+        # via a real live PDF upload where they leaked into MICROSCOPIC).
+        r"^dr\.\s+\S+.*\bm\.d\.,",
+        r"board certified pathologist",
+        r"sign-?off date\s*/\s*time",
+        r"for medical advice or diagnosis,?\s*consult a professional",
+        r"ai responses may include mistakes",
     )
 ]
 
