@@ -14,6 +14,7 @@ import pytest
 
 from coding_agent.extract.schema import AbstentionReason
 from coding_agent.extract.specimens import (
+    GrokClient,
     GroqClient,
     GroqRequestError,
     SpecimenExtractionRejectedError,
@@ -230,5 +231,55 @@ class TestGroqClient:
             "urllib.request.urlopen",
             side_effect=urllib.error.URLError("no route to host"),
         ):
-            with pytest.raises(GroqRequestError, match="could not reach Groq API"):
+            with pytest.raises(GroqRequestError, match="could not reach"):
                 client.create_message(model="llama-3.3-70b-versatile", prompt="hello")
+
+
+class TestGrokClient:
+    """GrokClient (xAI) shares its HTTP call with GroqClient via
+    _call_openai_compatible_chat -- these tests cover only what's
+    specific to it: its own env var, endpoint, and error type."""
+
+    def test_requires_api_key_at_construction(self, monkeypatch):
+        monkeypatch.delenv("XAI_API_KEY", raising=False)
+        with pytest.raises(RuntimeError, match="XAI_API_KEY"):
+            GrokClient()
+
+    def test_create_message_hits_the_xai_endpoint(self, monkeypatch):
+        monkeypatch.setenv("XAI_API_KEY", "test-xai-key")
+        client = GrokClient()
+
+        payload = json.dumps(
+            {
+                "choices": [{"message": {"content": '{"abstain": false, "mentions": []}'}}],
+                "usage": {"prompt_tokens": 10, "completion_tokens": 3},
+            }
+        ).encode("utf-8")
+        fake_response = MagicMock()
+        fake_response.__enter__.return_value = fake_response
+        fake_response.read.return_value = payload
+
+        with patch("urllib.request.urlopen", return_value=fake_response) as mock_urlopen:
+            text, input_tokens, output_tokens = client.create_message(model="grok-4", prompt="hello")
+
+        assert text == '{"abstain": false, "mentions": []}'
+        assert (input_tokens, output_tokens) == (10, 3)
+        request = mock_urlopen.call_args[0][0]
+        assert request.full_url == "https://api.x.ai/v1/chat/completions"
+        assert request.get_header("Authorization") == "Bearer test-xai-key"
+
+    def test_http_error_becomes_a_model_request_error(self, monkeypatch):
+        monkeypatch.setenv("XAI_API_KEY", "test-xai-key")
+        client = GrokClient()
+
+        error_body = io.BytesIO(b'{"error": "invalid api key"}')
+        http_error = urllib.error.HTTPError(
+            url="https://api.x.ai/v1/chat/completions",
+            code=401,
+            msg="Unauthorized",
+            hdrs=None,
+            fp=error_body,
+        )
+        with patch("urllib.request.urlopen", side_effect=http_error):
+            with pytest.raises(GroqRequestError, match="invalid api key"):
+                client.create_message(model="grok-4", prompt="hello")

@@ -174,17 +174,30 @@ above:
    and a report using different disclaimer wording than the patterns
    here will pass its own boilerplate through untouched.
 
-8. **Two interchangeable model backends, not one.** `extract/
+8. **Three interchangeable model backends, not one.** `extract/
    specimens.py`'s `ModelClient` Protocol was already provider-agnostic
-   by design (one method, `create_message`); `GroqClient` is a second
-   real implementation, added when Anthropic account credits ran out
-   mid-testing and free-tier testing was wanted. It's a stdlib-only
-   (`urllib`) adapter over Groq's OpenAI-compatible endpoint, no new
+   by design (one method, `create_message`); `GroqClient` and
+   `GrokClient` are two more real implementations, added when Anthropic
+   account credits ran out mid-testing and alternatives were wanted.
+   Both are stdlib-only (`urllib`) adapters over an OpenAI-compatible
+   chat completions endpoint (Groq's and xAI's respectively, sharing
+   one private helper, `_call_openai_compatible_chat`), no new
    dependency. `api/app.py`'s `_resolve_live_client()` picks Anthropic
-   over Groq when both keys are set, purely because Anthropic is this
-   project's default model (`claude-sonnet-5`) — not a statement that
-   one produces better extractions than the other; that comparison
-   hasn't been run. `GROQ_DEFAULT_MODEL` (`llama-3.3-70b-versatile`) is
-   Groq's current general-purpose model at time of writing; Groq's
-   catalog changes faster than Anthropic's, so this is more likely to
-   need bumping later than `DEFAULT_MODEL` is.
+   over Groq over Grok when more than one key is set, purely because
+   Anthropic is this project's default model (`claude-sonnet-5`) — not
+   a statement that any one backend produces better extractions than
+   the others; that comparison hasn't been run (and would be a good use
+   of `eval/repeatability.py` later). `GROQ_DEFAULT_MODEL`
+   (`llama-3.3-70b-versatile`) and `GROK_DEFAULT_MODEL` (`grok-4`) are
+   each provider's current general-purpose model at time of writing;
+   both catalogs change faster than Anthropic's, so these are more
+   likely to need bumping later than `DEFAULT_MODEL` is. Only
+   `AnthropicClient` was ever verified against a live call from this
+   build environment: this sandbox's outbound network policy rejects
+   the CONNECT for both `api.groq.com` and `api.x.ai`, so `GroqClient`
+   and `GrokClient` are written and unit-tested (mocked HTTP, matching
+   each provider's documented request/response shape) but their live
+   verification happens on whoever actually runs the server with a real
+   key, not here.
+   endpoint were reachable; xAI's was not), so live verification of this
+   one backend happens on whoever runs the server locally, not here.

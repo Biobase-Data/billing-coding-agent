@@ -33,6 +33,7 @@ PROMPT_FILE = "specimens_v1.txt"
 PROMPT_VERSION = "specimens_v1"
 DEFAULT_MODEL = "claude-sonnet-5"
 GROQ_DEFAULT_MODEL = "llama-3.3-70b-versatile"
+GROK_DEFAULT_MODEL = "grok-4"
 MAX_TOKENS = 4096
 
 _SEARCHABLE_SECTIONS = (
@@ -97,20 +98,66 @@ class AnthropicClient:
         return text, getattr(usage, "input_tokens", 0), getattr(usage, "output_tokens", 0)
 
 
-class GroqRequestError(RuntimeError):
-    """Raised when a Groq API call fails -- carries the decoded error
-    body (when available) rather than letting a bare HTTPError surface,
-    since that body is where an invalid-key or rate-limit reason lives.
+class ModelRequestError(RuntimeError):
+    """Raised when a live model backend's HTTP call fails -- carries the
+    decoded error body (when available) rather than letting a bare
+    HTTPError surface, since that body is where an invalid-key or
+    rate-limit reason lives."""
+
+
+GroqRequestError = ModelRequestError
+"""Kept as a name-compatible alias: earlier code imported this name
+specifically for Groq. It is the same exception type every
+OpenAI-compatible backend below raises -- there is nothing
+Groq-specific about the class itself."""
+
+
+def _call_openai_compatible_chat(
+    *, endpoint: str, api_key: str, model: str, prompt: str
+) -> tuple[str, int, int]:
+    """Shared HTTP call for any OpenAI-compatible chat completions
+    endpoint (Groq, xAI's Grok, and others that copy the same shape).
+    Stdlib-only (`urllib`) rather than pulling in the `openai` SDK just
+    for one request/response shape this module already knows how to
+    build and parse directly.
     """
+    import urllib.error
+    import urllib.request
+
+    body = json.dumps(
+        {
+            "model": model,
+            "messages": [{"role": "user", "content": prompt}],
+            "max_tokens": MAX_TOKENS,
+        }
+    ).encode("utf-8")
+    request = urllib.request.Request(
+        endpoint,
+        data=body,
+        method="POST",
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=60) as response:
+            payload = json.loads(response.read())
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode("utf-8", errors="replace")
+        raise ModelRequestError(f"{endpoint} returned {exc.code}: {detail}") from exc
+    except urllib.error.URLError as exc:
+        raise ModelRequestError(f"could not reach {endpoint}: {exc.reason}") from exc
+
+    text = payload["choices"][0]["message"]["content"]
+    usage = payload.get("usage", {})
+    return text, usage.get("prompt_tokens", 0), usage.get("completion_tokens", 0)
 
 
 class GroqClient:
     """Adapter over Groq's free-tier hosting of open-source models
     (https://console.groq.com), via its OpenAI-compatible chat
-    completions endpoint. Deliberately stdlib-only (`urllib`) rather
-    than pulling in the `openai` SDK just for one endpoint shape this
-    module already knows how to call directly.
-    """
+    completions endpoint."""
 
     _ENDPOINT = "https://api.groq.com/openai/v1/chat/completions"
 
@@ -123,37 +170,33 @@ class GroqClient:
         self._api_key = api_key
 
     def create_message(self, *, model: str, prompt: str) -> tuple[str, int, int]:
-        import urllib.error
-        import urllib.request
-
-        body = json.dumps(
-            {
-                "model": model,
-                "messages": [{"role": "user", "content": prompt}],
-                "max_tokens": MAX_TOKENS,
-            }
-        ).encode("utf-8")
-        request = urllib.request.Request(
-            self._ENDPOINT,
-            data=body,
-            method="POST",
-            headers={
-                "Authorization": f"Bearer {self._api_key}",
-                "Content-Type": "application/json",
-            },
+        return _call_openai_compatible_chat(
+            endpoint=self._ENDPOINT, api_key=self._api_key, model=model, prompt=prompt
         )
-        try:
-            with urllib.request.urlopen(request, timeout=60) as response:
-                payload = json.loads(response.read())
-        except urllib.error.HTTPError as exc:
-            detail = exc.read().decode("utf-8", errors="replace")
-            raise GroqRequestError(f"Groq API returned {exc.code}: {detail}") from exc
-        except urllib.error.URLError as exc:
-            raise GroqRequestError(f"could not reach Groq API: {exc.reason}") from exc
 
-        text = payload["choices"][0]["message"]["content"]
-        usage = payload.get("usage", {})
-        return text, usage.get("prompt_tokens", 0), usage.get("completion_tokens", 0)
+
+class GrokClient:
+    """Adapter over xAI's Grok API (https://api.x.ai), via its
+    OpenAI-compatible chat completions endpoint. Unlike Groq's free
+    tier, this is a paid/metered API -- see ASSUMPTIONS.md for why it's
+    a separate backend from Groq rather than the same one, despite the
+    near-identical names.
+    """
+
+    _ENDPOINT = "https://api.x.ai/v1/chat/completions"
+
+    def __init__(self) -> None:
+        import os
+
+        api_key = os.environ.get("XAI_API_KEY")
+        if not api_key:
+            raise RuntimeError("XAI_API_KEY is not set")
+        self._api_key = api_key
+
+    def create_message(self, *, model: str, prompt: str) -> tuple[str, int, int]:
+        return _call_openai_compatible_chat(
+            endpoint=self._ENDPOINT, api_key=self._api_key, model=model, prompt=prompt
+        )
 
 
 class _RawMention(BaseModel):

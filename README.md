@@ -106,16 +106,20 @@ It gives you three ways to try it:
   **Blocked** rather than inventing a specimen count from the narrative
   — you'll still see what labels the narrative itself names.
 
-The two live-model paths need a key for **either** of two interchangeable
-backends (`extract/specimens.py`'s `ModelClient` Protocol is provider-
-agnostic by design — `_resolve_live_client()` in `api/app.py` just picks
-whichever is set, Anthropic first):
+The two live-model paths need a key for **any one** of three
+interchangeable backends (`extract/specimens.py`'s `ModelClient` Protocol
+is provider-agnostic by design — `_resolve_live_client()` in `api/app.py`
+just picks whichever is set, in this order):
 
 - `ANTHROPIC_API_KEY` — this project's default, `claude-sonnet-5`.
 - `GROQ_API_KEY` — a free-tier alternative hosting open-source models
   (get one at [console.groq.com](https://console.groq.com)), useful for
   testing without any Anthropic spend. Defaults to
-  `llama-3.3-70b-versatile`.
+  `llama-3.3-70b-versatile`. Not to be confused with the next one —
+  "Groq" (the inference host) and "Grok" (xAI's model) are easy to mix
+  up but are different services with different keys.
+- `XAI_API_KEY` — xAI's Grok API (api.x.ai), a paid/metered API like
+  Anthropic's, not a free tier. Defaults to `grok-4`.
 
 This is a hand-testing console, not a production review service — see
 `pipeline/api/` for that pattern applied to the older demo build.

@@ -13,7 +13,14 @@ from fastapi.testclient import TestClient
 from fpdf import FPDF
 
 from coding_agent.api.app import ACTIONS_DIR, app, _resolve_live_client
-from coding_agent.extract.specimens import DEFAULT_MODEL, GROQ_DEFAULT_MODEL, AnthropicClient, GroqClient
+from coding_agent.extract.specimens import (
+    DEFAULT_MODEL,
+    GROK_DEFAULT_MODEL,
+    GROQ_DEFAULT_MODEL,
+    AnthropicClient,
+    GrokClient,
+    GroqClient,
+)
 
 client = TestClient(app)
 
@@ -185,33 +192,52 @@ class TestResolveLiveClient:
     vendor -- see extract/specimens.py's provider-agnostic ModelClient
     Protocol."""
 
+    def _clear_all_keys(self, monkeypatch):
+        for key in ("ANTHROPIC_API_KEY", "GROQ_API_KEY", "XAI_API_KEY"):
+            monkeypatch.delenv(key, raising=False)
+
     def test_picks_anthropic_when_only_anthropic_key_set(self, monkeypatch):
+        self._clear_all_keys(monkeypatch)
         monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
-        monkeypatch.delenv("GROQ_API_KEY", raising=False)
         model_client, model = _resolve_live_client()
         assert isinstance(model_client, AnthropicClient)
         assert model == DEFAULT_MODEL
 
     def test_picks_groq_when_only_groq_key_set(self, monkeypatch):
-        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+        self._clear_all_keys(monkeypatch)
         monkeypatch.setenv("GROQ_API_KEY", "test-key")
         model_client, model = _resolve_live_client()
         assert isinstance(model_client, GroqClient)
         assert model == GROQ_DEFAULT_MODEL
 
-    def test_anthropic_wins_when_both_keys_set(self, monkeypatch):
+    def test_picks_grok_when_only_xai_key_set(self, monkeypatch):
+        self._clear_all_keys(monkeypatch)
+        monkeypatch.setenv("XAI_API_KEY", "test-key")
+        model_client, model = _resolve_live_client()
+        assert isinstance(model_client, GrokClient)
+        assert model == GROK_DEFAULT_MODEL
+
+    def test_anthropic_wins_over_groq_and_grok(self, monkeypatch):
+        self._clear_all_keys(monkeypatch)
         monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
         monkeypatch.setenv("GROQ_API_KEY", "test-key")
+        monkeypatch.setenv("XAI_API_KEY", "test-key")
         model_client, _ = _resolve_live_client()
         assert isinstance(model_client, AnthropicClient)
 
-    def test_raises_when_neither_key_set(self, monkeypatch):
-        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
-        monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    def test_groq_wins_over_grok_when_anthropic_absent(self, monkeypatch):
+        self._clear_all_keys(monkeypatch)
+        monkeypatch.setenv("GROQ_API_KEY", "test-key")
+        monkeypatch.setenv("XAI_API_KEY", "test-key")
+        model_client, _ = _resolve_live_client()
+        assert isinstance(model_client, GroqClient)
+
+    def test_raises_when_no_key_set(self, monkeypatch):
+        self._clear_all_keys(monkeypatch)
         with pytest.raises(Exception) as exc_info:
             _resolve_live_client()
         assert exc_info.value.status_code == 400
-        assert "GROQ_API_KEY" in exc_info.value.detail
+        assert "XAI_API_KEY" in exc_info.value.detail
 
 
 def test_pdf_run_falls_back_to_groq_when_only_groq_key_set(monkeypatch):

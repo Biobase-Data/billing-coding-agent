@@ -15,9 +15,9 @@ pipeline:
 
 Both custom-input endpoints need a live model call, picked by
 `_resolve_live_client()` from whichever provider has a key set in the
-server's environment (`ANTHROPIC_API_KEY` or the free-tier
-`GROQ_API_KEY` -- see extract/specimens.py's `ModelClient` Protocol,
-deliberately provider-agnostic).
+server's environment (`ANTHROPIC_API_KEY`, the free-tier `GROQ_API_KEY`,
+or `XAI_API_KEY` for xAI's Grok -- see extract/specimens.py's
+`ModelClient` Protocol, deliberately provider-agnostic).
 
 Coder actions (accept/edit/remove) recorded against a sample case are
 appended to `runs/coding_agent_actions/<case_id>.jsonl` -- gitignored,
@@ -43,11 +43,13 @@ from coding_agent.audit.log import ActionLog, CoderAction, record_action
 from coding_agent.audit.stamp import stamp
 from coding_agent.extract.specimens import (
     DEFAULT_MODEL,
+    GROK_DEFAULT_MODEL,
     GROQ_DEFAULT_MODEL,
     AnthropicClient,
+    GrokClient,
     GroqClient,
-    GroqRequestError,
     ModelClient,
+    ModelRequestError,
     extract_specimen_mentions,
 )
 from coding_agent.normalize.case import Case
@@ -62,9 +64,10 @@ STATIC_DIR = Path(__file__).with_name("static")
 ACTIONS_DIR = Path(__file__).resolve().parents[3] / "runs" / "coding_agent_actions"
 
 _NO_API_KEY_DETAIL = (
-    "No live model backend configured -- set ANTHROPIC_API_KEY, or GROQ_API_KEY "
-    "for a free-tier alternative (console.groq.com), in the environment the "
-    "server runs in. Try a sample case instead, which runs offline."
+    "No live model backend configured -- set ANTHROPIC_API_KEY, GROQ_API_KEY "
+    "for a free-tier alternative (console.groq.com), or XAI_API_KEY for xAI's "
+    "Grok, in the environment the server runs in. Try a sample case instead, "
+    "which runs offline."
 )
 
 app = FastAPI(title="coding_agent V0 test console")
@@ -72,13 +75,15 @@ app = FastAPI(title="coding_agent V0 test console")
 
 def _resolve_live_client() -> tuple[ModelClient, str]:
     """Pick a live ModelClient from whichever provider has a key set in
-    the server's environment. Anthropic wins if both are set, since
-    that's this project's default model. Raises HTTPException(400) if
-    neither is configured."""
+    the server's environment, checked in this order: Anthropic (this
+    project's default model), then Groq's free tier, then xAI's Grok.
+    Raises HTTPException(400) if none is configured."""
     if os.environ.get("ANTHROPIC_API_KEY"):
         return AnthropicClient(), DEFAULT_MODEL
     if os.environ.get("GROQ_API_KEY"):
         return GroqClient(), GROQ_DEFAULT_MODEL
+    if os.environ.get("XAI_API_KEY"):
+        return GrokClient(), GROK_DEFAULT_MODEL
     raise HTTPException(status_code=400, detail=_NO_API_KEY_DETAIL)
 
 
@@ -180,7 +185,7 @@ def _run_live_pipeline(
     bidirectional recommendation -> version stamp -> response dict."""
     try:
         extraction, _metrics = extract_specimen_mentions(case, client=client, model=model)
-    except GroqRequestError as exc:
+    except ModelRequestError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
     recommendation = build_recommendation(case, extraction, baseline=(), primary_code=primary_code)
     audited = stamp(
