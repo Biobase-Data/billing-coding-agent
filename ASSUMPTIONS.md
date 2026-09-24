@@ -297,3 +297,21 @@ above:
     (`test_custom_run_wires_in_cpt_level_recommendation_alongside_unit_reconciliation`),
     not yet verified against a real model call from this build
     environment (same caveat as the Groq/Grok backends themselves).
+
+12. **Evidence-span matching tolerates whitespace differences, not
+    content differences.** Found via a real live PDF upload:
+    `extract/spans.py`'s `locate()` rejected a real, correct model quote
+    ("excision of grossly unremarkable pink-tan skin") because the PDF's
+    text extraction preserved a mid-sentence line wrap as a literal
+    newline in the source (`"...unremarkable\npink-tan skin..."`), while
+    the model naturally reproduced its "verbatim" quote with a plain
+    space instead. This was rejecting a formatting artifact as if it
+    were a hallucination. `locate()` now falls back to a whitespace-
+    tolerant match (any run of whitespace in the quote matches any run
+    of whitespace in the source) only after an exact match fails; every
+    non-whitespace character still must match exactly, and the returned
+    `EvidenceSpan.quoted` is always the real source substring (offsets
+    and text), never the model's normalized version -- so
+    `Case.resolve_span`'s later re-verification still holds. This is
+    shared by both extraction tasks (`extract/specimens.py` and
+    `extract/procedure_type.py`), since both call the same `locate()`.
