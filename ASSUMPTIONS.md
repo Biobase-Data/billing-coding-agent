@@ -315,3 +315,42 @@ above:
     `Case.resolve_span`'s later re-verification still holds. This is
     shared by both extraction tasks (`extract/specimens.py` and
     `extract/procedure_type.py`), since both call the same `locate()`.
+
+13. **Cassette/block identifiers were being extracted as if they were
+    specimen labels -- found by inspecting a live PDF run's output, not
+    a crash.** A real report described one unlettered specimen ("left
+    shoulder mass") divided into cassettes for processing
+    ("representative sections are submitted in cassettes A1-A7"). The
+    specimen extractor reported all seven cassette identifiers
+    (`A1`..`A7`) as seven distinct specimen labels. Every one of those
+    quotes was real and verbatim, so span verification correctly passed
+    them -- the bug was semantic, not mechanical: `specimens_v1.txt`
+    never told the model that a cassette/block identifier names a
+    sub-part of one specimen, not a specimen itself.
+
+    This case happened to render harmlessly (`Blocked` on
+    `accessioning_specimen_list_absent`, since a bare PDF upload has no
+    structured specimen list for `rules/units.py` to reconcile against),
+    but that is incidental to this input, not a property of the fix.
+    Had a real accessioning record been attached showing one specimen,
+    `rules/units.py` would have confidently reported six phantom
+    "missing from accessioning" specimens: a false-positive specimen
+    miscount, which is the exact failure mode the strategy doc names as
+    highest-priority to get right, since specimen-count reconciliation
+    is the entire evidentiary basis of the Phase 1 wedge.
+
+    Fixed in the prompts (`specimens_v1.txt`, `procedure_type_v1.txt`):
+    both now explicitly define cassette/block identifiers as sub-parts
+    of a specimen, never a specimen in their own right, and instruct
+    the model to abstain (specimens_v1) or omit that specimen
+    (procedure_type_v1) rather than invent a specimen-level label from
+    cassette numbers when the narrative gives a specimen no label of
+    its own. This is a prompt fix, not a code fix -- there is no
+    deterministic guard against it, deliberately: a regex heuristic
+    distinguishing "real" labels from cassette-shaped ones would be a
+    judgment call smuggled into extract/ disguised as a rule, which is
+    exactly what this architecture's extract/rules split says not to
+    do. Not yet re-verified against a real model call from this build
+    environment (same network-access caveat as every other live-model
+    claim in this document) -- the next live PDF run against this exact
+    report is the actual regression test for this fix.

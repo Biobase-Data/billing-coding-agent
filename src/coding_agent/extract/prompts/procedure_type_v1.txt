@@ -10,6 +10,15 @@ cleanly onto one of these categories; if the report uses a more specific
 term (e.g. "shave biopsy", "punch biopsy"), report the general category
 ("biopsy") it belongs to.
 
+A specimen's own label is never a cassette or block identifier. Reports
+often divide one specimen's tissue into cassettes for processing (e.g.
+"submitted in cassettes A1-A7") -- "A1" through "A7" there name
+sub-parts of one specimen prepared for microscopy, not seven specimens.
+Key each procedure type to the specimen's own label, if it has one; if
+the narrative gives the specimen no distinct label of its own, only
+cassette or block identifiers, omit that specimen rather than keying a
+procedure type to one of its cassette numbers.
+
 For each specimen label, quote the exact verbatim text span that
 supports the procedure type you identified, and say which section it
 came from. Never paraphrase the quoted text.

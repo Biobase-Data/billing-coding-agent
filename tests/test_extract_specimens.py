@@ -168,6 +168,24 @@ def test_empty_mentions_without_abstain_is_a_valid_zero_specimen_result():
     assert extraction.mentions == ()
 
 
+def test_prompt_distinguishes_cassette_ids_from_specimen_labels():
+    """Regression coverage for a real bug found via a live PDF upload: a
+    report describing one unlettered specimen divided into cassettes
+    ("submitted in cassettes A1-A7") was extracted as seven distinct
+    specimen labels, since the prompt never said a cassette/block
+    identifier isn't a specimen. There is no code-level guard against
+    this -- see ASSUMPTIONS.md #13 for why a regex heuristic would be
+    the wrong fix -- so this test locks the prompt's own wording in
+    place instead, the same way test_layer_boundary.py locks an
+    architectural invariant in place via static inspection rather than
+    behavioral proof."""
+    from coding_agent.extract.specimens import PROMPTS_DIR, PROMPT_FILE
+
+    prompt_text = (PROMPTS_DIR / PROMPT_FILE).read_text()
+    assert "cassette" in prompt_text.lower()
+    assert "not itself a separate specimen" in prompt_text or "never itself a separate specimen" in prompt_text
+
+
 class TestGroqClient:
     """GroqClient is a stdlib-only (urllib) adapter over Groq's
     OpenAI-compatible chat completions API -- mocked here rather than

@@ -241,3 +241,15 @@ def test_can_omit_one_specimen_while_reporting_another():
     extraction, _ = extract_procedure_types(case, client=FakeClient(response))
     assert not extraction.abstained
     assert {m.label for m in extraction.mentions} == {"A"}
+
+
+def test_prompt_distinguishes_cassette_ids_from_specimen_labels():
+    """Same regression coverage as
+    test_extract_specimens.test_prompt_distinguishes_cassette_ids_from_specimen_labels
+    -- this task shares the same "label" concept and the same real bug
+    (see ASSUMPTIONS.md #13), from a separate model call over the same
+    narrative."""
+    from coding_agent.extract.procedure_type import PROMPTS_DIR, PROMPT_FILE
+
+    prompt_text = (PROMPTS_DIR / PROMPT_FILE).read_text()
+    assert "cassette" in prompt_text.lower()

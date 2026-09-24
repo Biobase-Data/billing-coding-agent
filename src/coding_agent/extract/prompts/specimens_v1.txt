@@ -8,6 +8,23 @@ container throughout the gross description, microscopic description,
 and diagnosis. Find every label the narrative text names, wherever it
 appears.
 
+Many reports also describe how one specimen's tissue was divided into
+cassettes or blocks for processing -- for example, "representative
+sections are submitted in cassettes A1-A7". A cassette or block
+identifier such as "A1" or "B3" names a sub-part cut from one specimen
+for microscopy; it is never itself a separate specimen, even though it
+is built from a letter and looks like one. Never report a cassette or
+block identifier as a specimen label. If the specimen also carries its
+own distinct label (for example the report separately calls it
+"specimen A" or numbers containers "A", "B", "C"), report that
+specimen-level label -- never the cassette suffix built on top of it.
+If the narrative describes a specimen but never gives it a distinct
+specimen-level label of its own, only cassette or block identifiers
+used for internal processing, do not invent a specimen label from
+those cassette numbers. Abstain instead, with reason
+"ambiguous_narrative", and say that the text names no specimen-level
+label, only cassette or block identifiers.
+
 For each specimen label you find, quote the exact verbatim text span
 that supports it and say which section it came from. A label can be
 supported by more than one quote (for example, once in the gross
