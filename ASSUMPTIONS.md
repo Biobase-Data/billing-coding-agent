@@ -173,3 +173,18 @@ above:
    fragment with no matching pattern can still survive into a section,
    and a report using different disclaimer wording than the patterns
    here will pass its own boilerplate through untouched.
+
+8. **Two interchangeable model backends, not one.** `extract/
+   specimens.py`'s `ModelClient` Protocol was already provider-agnostic
+   by design (one method, `create_message`); `GroqClient` is a second
+   real implementation, added when Anthropic account credits ran out
+   mid-testing and free-tier testing was wanted. It's a stdlib-only
+   (`urllib`) adapter over Groq's OpenAI-compatible endpoint, no new
+   dependency. `api/app.py`'s `_resolve_live_client()` picks Anthropic
+   over Groq when both keys are set, purely because Anthropic is this
+   project's default model (`claude-sonnet-5`) — not a statement that
+   one produces better extractions than the other; that comparison
+   hasn't been run. `GROQ_DEFAULT_MODEL` (`llama-3.3-70b-versatile`) is
+   Groq's current general-purpose model at time of writing; Groq's
+   catalog changes faster than Anthropic's, so this is more likely to
+   need bumping later than `DEFAULT_MODEL` is.

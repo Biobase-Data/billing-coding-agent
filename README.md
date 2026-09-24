@@ -92,18 +92,30 @@ It gives you three ways to try it:
   recommendation lines and accept/edit/remove them (recorded to
   `runs/coding_agent_actions/<case_id>.jsonl`, gitignored).
 - **Custom HL7v2/FHIR input** — paste your own HL7v2 message or FHIR R4
-  Bundle JSON and run it through a **live** model call; requires
-  `ANTHROPIC_API_KEY` in the environment the server runs in, and returns
-  a clear 400 without one rather than silently falling back to anything.
+  Bundle JSON and run it through a **live** model call; returns a clear
+  400 without a key configured rather than silently falling back to
+  anything.
 - **Custom PDF report** — upload a signed-out surgical pathology report
   PDF directly (`normalize/free_text.py` extracts text via `pypdf` and
   splits it into narrative sections by header keyword: Clinical History /
-  Gross Description / Microscopic Description / Diagnosis). A bare PDF
-  has no structured accessioning specimen list the way an HL7/FHIR feed
-  does, so `Case.specimens` always comes back `Absent` here and
-  reconciliation correctly reports **Blocked** rather than inventing a
-  specimen count from the narrative — you'll still see what labels the
-  narrative itself names. Also requires `ANTHROPIC_API_KEY`.
+  Gross Description / Microscopic Description / Diagnosis, stripping a
+  narrow allowlist of signature-block/CLIA/legal boilerplate before the
+  text reaches the model). A bare PDF has no structured accessioning
+  specimen list the way an HL7/FHIR feed does, so `Case.specimens`
+  always comes back `Absent` here and reconciliation correctly reports
+  **Blocked** rather than inventing a specimen count from the narrative
+  — you'll still see what labels the narrative itself names.
+
+The two live-model paths need a key for **either** of two interchangeable
+backends (`extract/specimens.py`'s `ModelClient` Protocol is provider-
+agnostic by design — `_resolve_live_client()` in `api/app.py` just picks
+whichever is set, Anthropic first):
+
+- `ANTHROPIC_API_KEY` — this project's default, `claude-sonnet-5`.
+- `GROQ_API_KEY` — a free-tier alternative hosting open-source models
+  (get one at [console.groq.com](https://console.groq.com)), useful for
+  testing without any Anthropic spend. Defaults to
+  `llama-3.3-70b-versatile`.
 
 This is a hand-testing console, not a production review service — see
 `pipeline/api/` for that pattern applied to the older demo build.

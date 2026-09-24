@@ -5,13 +5,19 @@ pipeline:
   replayed through the real parsing/reconciliation code path with no
   API key required -- see eval/harness.py's ReplayClient.
 - Custom HL7v2/FHIR input (`POST /api/custom/run`): paste raw text and
-  run it through a live model call. Requires ANTHROPIC_API_KEY.
+  run it through a live model call.
 - Custom PDF report (`POST /api/custom/pdf-run`): upload a signed-out
   report PDF; text is extracted and section-split by
   normalize/free_text.py. Specimens always come back Absent here (a
   bare report has no structured accessioning specimen list), so
   reconciliation is expected to report Blocked -- see that module's
-  docstring. Also requires ANTHROPIC_API_KEY.
+  docstring.
+
+Both custom-input endpoints need a live model call, picked by
+`_resolve_live_client()` from whichever provider has a key set in the
+server's environment (`ANTHROPIC_API_KEY` or the free-tier
+`GROQ_API_KEY` -- see extract/specimens.py's `ModelClient` Protocol,
+deliberately provider-agnostic).
 
 Coder actions (accept/edit/remove) recorded against a sample case are
 appended to `runs/coding_agent_actions/<case_id>.jsonl` -- gitignored,
@@ -35,7 +41,15 @@ from pydantic import BaseModel
 
 from coding_agent.audit.log import ActionLog, CoderAction, record_action
 from coding_agent.audit.stamp import stamp
-from coding_agent.extract.specimens import AnthropicClient, extract_specimen_mentions
+from coding_agent.extract.specimens import (
+    DEFAULT_MODEL,
+    GROQ_DEFAULT_MODEL,
+    AnthropicClient,
+    GroqClient,
+    GroqRequestError,
+    ModelClient,
+    extract_specimen_mentions,
+)
 from coding_agent.normalize.case import Case
 from coding_agent.normalize.fhir import FhirNormalizationError, parse_bundle
 from coding_agent.normalize.free_text import FreeTextNormalizationError, parse_report_text
@@ -48,11 +62,24 @@ STATIC_DIR = Path(__file__).with_name("static")
 ACTIONS_DIR = Path(__file__).resolve().parents[3] / "runs" / "coding_agent_actions"
 
 _NO_API_KEY_DETAIL = (
-    "ANTHROPIC_API_KEY is not set -- custom input requires a live model call. "
-    "Try a sample case instead, which runs offline."
+    "No live model backend configured -- set ANTHROPIC_API_KEY, or GROQ_API_KEY "
+    "for a free-tier alternative (console.groq.com), in the environment the "
+    "server runs in. Try a sample case instead, which runs offline."
 )
 
 app = FastAPI(title="coding_agent V0 test console")
+
+
+def _resolve_live_client() -> tuple[ModelClient, str]:
+    """Pick a live ModelClient from whichever provider has a key set in
+    the server's environment. Anthropic wins if both are set, since
+    that's this project's default model. Raises HTTPException(400) if
+    neither is configured."""
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        return AnthropicClient(), DEFAULT_MODEL
+    if os.environ.get("GROQ_API_KEY"):
+        return GroqClient(), GROQ_DEFAULT_MODEL
+    raise HTTPException(status_code=400, detail=_NO_API_KEY_DETAIL)
 
 
 def _action_log(case_id: str) -> ActionLog:
@@ -146,10 +173,15 @@ class CustomRunRequest(BaseModel):
     primary_code: str
 
 
-def _run_live_pipeline(case: Case, primary_code: str) -> dict[str, Any]:
+def _run_live_pipeline(
+    case: Case, primary_code: str, client: ModelClient, model: str
+) -> dict[str, Any]:
     """Shared tail of both custom-input endpoints: live extraction ->
     bidirectional recommendation -> version stamp -> response dict."""
-    extraction, _metrics = extract_specimen_mentions(case, client=AnthropicClient())
+    try:
+        extraction, _metrics = extract_specimen_mentions(case, client=client, model=model)
+    except GroqRequestError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
     recommendation = build_recommendation(case, extraction, baseline=(), primary_code=primary_code)
     audited = stamp(
         recommendation,
@@ -172,8 +204,7 @@ def _run_live_pipeline(case: Case, primary_code: str) -> dict[str, Any]:
 
 @app.post("/api/custom/run")
 def run_custom(body: CustomRunRequest) -> dict[str, Any]:
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        raise HTTPException(status_code=400, detail=_NO_API_KEY_DETAIL)
+    client, model = _resolve_live_client()
 
     try:
         case: Case = (
@@ -184,7 +215,7 @@ def run_custom(body: CustomRunRequest) -> dict[str, Any]:
     except (Hl7NormalizationError, FhirNormalizationError, json.JSONDecodeError) as exc:
         raise HTTPException(status_code=422, detail=f"could not normalize input: {exc}") from exc
 
-    return _run_live_pipeline(case, body.primary_code)
+    return _run_live_pipeline(case, body.primary_code, client, model)
 
 
 def _extract_pdf_text(data: bytes) -> str:
@@ -199,8 +230,7 @@ async def run_custom_pdf(
     date_of_service: str = Form(...),
     primary_code: str = Form(...),
 ) -> dict[str, Any]:
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        raise HTTPException(status_code=400, detail=_NO_API_KEY_DETAIL)
+    client, model = _resolve_live_client()
 
     try:
         service_date = date_cls.fromisoformat(date_of_service)
@@ -225,7 +255,7 @@ async def run_custom_pdf(
     except FreeTextNormalizationError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    return _run_live_pipeline(case, primary_code)
+    return _run_live_pipeline(case, primary_code, client, model)
 
 
 @app.get("/")

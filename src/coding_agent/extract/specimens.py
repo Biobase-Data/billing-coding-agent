@@ -32,6 +32,7 @@ PROMPTS_DIR = Path(__file__).with_name("prompts")
 PROMPT_FILE = "specimens_v1.txt"
 PROMPT_VERSION = "specimens_v1"
 DEFAULT_MODEL = "claude-sonnet-5"
+GROQ_DEFAULT_MODEL = "llama-3.3-70b-versatile"
 MAX_TOKENS = 4096
 
 _SEARCHABLE_SECTIONS = (
@@ -57,9 +58,12 @@ class ExtractionMetrics:
 
 
 class ModelClient(Protocol):
-    """The one method this module needs from an Anthropic SDK client --
-    typed as a Protocol so tests can pass a stub instead of a live client
-    without importing the real SDK."""
+    """The one method a model backend needs to supply -- typed as a
+    Protocol, deliberately provider-agnostic, so tests can pass a stub
+    without importing any real SDK, and this module is never coupled to
+    a single vendor. `AnthropicClient` and `GroqClient` below are two
+    interchangeable implementations; `extract_specimen_mentions` doesn't
+    care which one it's given."""
 
     def create_message(self, *, model: str, prompt: str) -> tuple[str, int, int]:
         """Return (response_text, input_tokens, output_tokens)."""
@@ -91,6 +95,65 @@ class AnthropicClient:
         )
         usage = response.usage
         return text, getattr(usage, "input_tokens", 0), getattr(usage, "output_tokens", 0)
+
+
+class GroqRequestError(RuntimeError):
+    """Raised when a Groq API call fails -- carries the decoded error
+    body (when available) rather than letting a bare HTTPError surface,
+    since that body is where an invalid-key or rate-limit reason lives.
+    """
+
+
+class GroqClient:
+    """Adapter over Groq's free-tier hosting of open-source models
+    (https://console.groq.com), via its OpenAI-compatible chat
+    completions endpoint. Deliberately stdlib-only (`urllib`) rather
+    than pulling in the `openai` SDK just for one endpoint shape this
+    module already knows how to call directly.
+    """
+
+    _ENDPOINT = "https://api.groq.com/openai/v1/chat/completions"
+
+    def __init__(self) -> None:
+        import os
+
+        api_key = os.environ.get("GROQ_API_KEY")
+        if not api_key:
+            raise RuntimeError("GROQ_API_KEY is not set")
+        self._api_key = api_key
+
+    def create_message(self, *, model: str, prompt: str) -> tuple[str, int, int]:
+        import urllib.error
+        import urllib.request
+
+        body = json.dumps(
+            {
+                "model": model,
+                "messages": [{"role": "user", "content": prompt}],
+                "max_tokens": MAX_TOKENS,
+            }
+        ).encode("utf-8")
+        request = urllib.request.Request(
+            self._ENDPOINT,
+            data=body,
+            method="POST",
+            headers={
+                "Authorization": f"Bearer {self._api_key}",
+                "Content-Type": "application/json",
+            },
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=60) as response:
+                payload = json.loads(response.read())
+        except urllib.error.HTTPError as exc:
+            detail = exc.read().decode("utf-8", errors="replace")
+            raise GroqRequestError(f"Groq API returned {exc.code}: {detail}") from exc
+        except urllib.error.URLError as exc:
+            raise GroqRequestError(f"could not reach Groq API: {exc.reason}") from exc
+
+        text = payload["choices"][0]["message"]["content"]
+        usage = payload.get("usage", {})
+        return text, usage.get("prompt_tokens", 0), usage.get("completion_tokens", 0)
 
 
 class _RawMention(BaseModel):

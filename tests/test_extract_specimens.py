@@ -4,13 +4,18 @@ of untrustworthy model output."""
 
 from __future__ import annotations
 
+import io
 import json
+import urllib.error
 from datetime import date
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 from coding_agent.extract.schema import AbstentionReason
 from coding_agent.extract.specimens import (
+    GroqClient,
+    GroqRequestError,
     SpecimenExtractionRejectedError,
     extract_specimen_mentions,
 )
@@ -160,3 +165,70 @@ def test_empty_mentions_without_abstain_is_a_valid_zero_specimen_result():
     extraction, _ = extract_specimen_mentions(case, client=FakeClient(response))
     assert not extraction.abstained
     assert extraction.mentions == ()
+
+
+class TestGroqClient:
+    """GroqClient is a stdlib-only (urllib) adapter over Groq's
+    OpenAI-compatible chat completions API -- mocked here rather than
+    making a real network call."""
+
+    def test_requires_api_key_at_construction(self, monkeypatch):
+        monkeypatch.delenv("GROQ_API_KEY", raising=False)
+        with pytest.raises(RuntimeError, match="GROQ_API_KEY"):
+            GroqClient()
+
+    def test_create_message_parses_response_and_usage(self, monkeypatch):
+        monkeypatch.setenv("GROQ_API_KEY", "test-groq-key")
+        client = GroqClient()
+
+        payload = json.dumps(
+            {
+                "choices": [{"message": {"content": '{"abstain": false, "mentions": []}'}}],
+                "usage": {"prompt_tokens": 42, "completion_tokens": 7},
+            }
+        ).encode("utf-8")
+        fake_response = MagicMock()
+        fake_response.__enter__.return_value = fake_response
+        fake_response.read.return_value = payload
+
+        with patch("urllib.request.urlopen", return_value=fake_response) as mock_urlopen:
+            text, input_tokens, output_tokens = client.create_message(
+                model="llama-3.3-70b-versatile", prompt="hello"
+            )
+
+        assert text == '{"abstain": false, "mentions": []}'
+        assert (input_tokens, output_tokens) == (42, 7)
+
+        request = mock_urlopen.call_args[0][0]
+        assert request.full_url == "https://api.groq.com/openai/v1/chat/completions"
+        assert request.get_header("Authorization") == "Bearer test-groq-key"
+        sent_body = json.loads(request.data)
+        assert sent_body["model"] == "llama-3.3-70b-versatile"
+        assert sent_body["messages"] == [{"role": "user", "content": "hello"}]
+
+    def test_http_error_becomes_groq_request_error_with_body(self, monkeypatch):
+        monkeypatch.setenv("GROQ_API_KEY", "test-groq-key")
+        client = GroqClient()
+
+        error_body = io.BytesIO(b'{"error": {"message": "invalid api key"}}')
+        http_error = urllib.error.HTTPError(
+            url="https://api.groq.com/openai/v1/chat/completions",
+            code=401,
+            msg="Unauthorized",
+            hdrs=None,
+            fp=error_body,
+        )
+        with patch("urllib.request.urlopen", side_effect=http_error):
+            with pytest.raises(GroqRequestError, match="invalid api key"):
+                client.create_message(model="llama-3.3-70b-versatile", prompt="hello")
+
+    def test_url_error_becomes_groq_request_error(self, monkeypatch):
+        monkeypatch.setenv("GROQ_API_KEY", "test-groq-key")
+        client = GroqClient()
+
+        with patch(
+            "urllib.request.urlopen",
+            side_effect=urllib.error.URLError("no route to host"),
+        ):
+            with pytest.raises(GroqRequestError, match="could not reach Groq API"):
+                client.create_message(model="llama-3.3-70b-versatile", prompt="hello")

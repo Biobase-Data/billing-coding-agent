@@ -12,7 +12,8 @@ import pytest
 from fastapi.testclient import TestClient
 from fpdf import FPDF
 
-from coding_agent.api.app import ACTIONS_DIR, app
+from coding_agent.api.app import ACTIONS_DIR, app, _resolve_live_client
+from coding_agent.extract.specimens import DEFAULT_MODEL, GROQ_DEFAULT_MODEL, AnthropicClient, GroqClient
 
 client = TestClient(app)
 
@@ -175,4 +176,55 @@ def test_pdf_run_rejects_text_with_no_recognized_sections(monkeypatch):
         data={"accession_number": "S26-0099001", "date_of_service": "2026-01-20", "primary_code": "88305"},
     )
     assert resp.status_code == 422
+    assert "no recognized section" in resp.json()["detail"]
+
+
+class TestResolveLiveClient:
+    """_resolve_live_client() picks a live ModelClient from whichever
+    provider has a key set, so the test console isn't locked to one
+    vendor -- see extract/specimens.py's provider-agnostic ModelClient
+    Protocol."""
+
+    def test_picks_anthropic_when_only_anthropic_key_set(self, monkeypatch):
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+        monkeypatch.delenv("GROQ_API_KEY", raising=False)
+        model_client, model = _resolve_live_client()
+        assert isinstance(model_client, AnthropicClient)
+        assert model == DEFAULT_MODEL
+
+    def test_picks_groq_when_only_groq_key_set(self, monkeypatch):
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+        monkeypatch.setenv("GROQ_API_KEY", "test-key")
+        model_client, model = _resolve_live_client()
+        assert isinstance(model_client, GroqClient)
+        assert model == GROQ_DEFAULT_MODEL
+
+    def test_anthropic_wins_when_both_keys_set(self, monkeypatch):
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+        monkeypatch.setenv("GROQ_API_KEY", "test-key")
+        model_client, _ = _resolve_live_client()
+        assert isinstance(model_client, AnthropicClient)
+
+    def test_raises_when_neither_key_set(self, monkeypatch):
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+        monkeypatch.delenv("GROQ_API_KEY", raising=False)
+        with pytest.raises(Exception) as exc_info:
+            _resolve_live_client()
+        assert exc_info.value.status_code == 400
+        assert "GROQ_API_KEY" in exc_info.value.detail
+
+
+def test_pdf_run_falls_back_to_groq_when_only_groq_key_set(monkeypatch):
+    """The endpoint-level guard accepts GROQ_API_KEY too, not just
+    ANTHROPIC_API_KEY -- this only exercises the resolver gate, not a
+    live Groq call (parsing fails first on an unrelated-text PDF, which
+    is fine: it proves the key check passed)."""
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.setenv("GROQ_API_KEY", "test-key-parsing-path-only-not-real")
+    resp = client.post(
+        "/api/custom/pdf-run",
+        files={"file": ("report.pdf", _pdf_bytes(["just some unrelated text"]), "application/pdf")},
+        data={"accession_number": "S26-0099001", "date_of_service": "2026-01-20", "primary_code": "88305"},
+    )
+    assert resp.status_code == 422  # past the key gate; failed at section-recognition instead
     assert "no recognized section" in resp.json()["detail"]

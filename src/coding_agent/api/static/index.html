@@ -288,7 +288,7 @@ function renderCustomForm() {
   card.appendChild(el('div', { class: 'row' }, [fmtSelect, codeInput]));
   card.appendChild(textarea);
 
-  const runBtn = el('button', { class: 'run' }, ['Run (requires ANTHROPIC_API_KEY)']);
+  const runBtn = el('button', { class: 'run' }, ['Run (requires a live model key)']);
   const resultHolder = el('div', {});
   runBtn.addEventListener('click', async () => {
     if (!textarea.value.trim() || !codeInput.value) {
@@ -315,7 +315,7 @@ function renderCustomForm() {
       resultHolder.appendChild(el('p', { class: 'error' }, [e.message]));
     }
     runBtn.disabled = false;
-    runBtn.textContent = 'Run (requires ANTHROPIC_API_KEY)';
+    runBtn.textContent = 'Run (requires a live model key)';
   });
 
   main.appendChild(card);
@@ -343,7 +343,7 @@ function renderPdfForm() {
   card.appendChild(el('div', { class: 'row' }, [fileInput]));
   card.appendChild(el('div', { class: 'row' }, [accessionInput, dateInput, codeInput]));
 
-  const runBtn = el('button', { class: 'run' }, ['Run (requires ANTHROPIC_API_KEY)']);
+  const runBtn = el('button', { class: 'run' }, ['Run (requires a live model key)']);
   const resultHolder = el('div', {});
   runBtn.addEventListener('click', async () => {
     if (!fileInput.files[0]) { alert('Choose a PDF file first.'); return; }
@@ -373,7 +373,7 @@ function renderPdfForm() {
       resultHolder.appendChild(el('p', { class: 'error' }, [e.message]));
     }
     runBtn.disabled = false;
-    runBtn.textContent = 'Run (requires ANTHROPIC_API_KEY)';
+    runBtn.textContent = 'Run (requires a live model key)';
   });
 
   main.appendChild(card);
