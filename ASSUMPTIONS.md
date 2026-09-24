@@ -442,3 +442,47 @@ above:
     because no section was open, distinct from the already-correct
     "this section was never present" case) is real, undone work, not
     something to treat as covered by the fixes above.
+
+16. **First end-to-end proof, on a real report, that both recommend/
+    capabilities work past the accessioning-absent block -- and a real,
+    pre-existing gap it surfaced.** Every live PDF run this session
+    stopped at `ACCESSIONING_SPECIMEN_LIST_ABSENT`, since a bare PDF
+    never carries a structured specimen list (by design -- see
+    normalize/free_text.py). `tests/test_pipeline_real_report_end_to_end.py`
+    attaches a synthetic accessioning record (one specimen, "A", site
+    "left forearm skin") to the real melanoma-excision report from #15,
+    grounded in exactly what that narrative supports, to exercise
+    `rules/units.py` and `rules/cpt_level.py` themselves rather than
+    stopping at the block.
+
+    Result: unit reconciliation reaches `AGREED` with zero discrepancy
+    lines -- the narrative-extracted label ("A", from the real,
+    live-verified model response) matches the accessioning record
+    exactly. This is the first time in this project's history the
+    actual reconciliation logic, not just extraction or abstention, has
+    run to completion on a real (non-synthetic) report.
+
+    CPT-level recommendation reaches the rules layer too, but the one
+    specimen comes back in `unaddressed_specimen_ids`, not as a
+    finding: `rules/cpt_level.py`'s `SPECIMEN_LEVEL_TABLE` has no entry
+    for `("excision", "skin")` -- or any site category -- at all. This
+    is not a regression from anything built this session: checked
+    against `pipeline/map/catalog.py`, the table this was ported from,
+    which never had an excision entry either. It is a real, standing
+    gap: "excision" is one of only four categories
+    `procedure_type_v1.txt`'s own prompt asks the model to recognize,
+    yet the rules table cannot level a single one of them. Not filled
+    in here -- `rules/cpt_level.py`'s own stated policy requires a
+    cited source before a new table entry ("add the combination with a
+    cited source, or leave it for a coder to level by hand"), and none
+    is available from this build environment. Tracked as its own issue
+    (github.com/Biobase-Data/billing-coding-agent#2) rather than folded
+    silently into this entry, so it has a place to carry a citation
+    when one is added.
+
+    The test file is explicit, in its own docstring, about which of its
+    two model responses is live-verified (specimen extraction: yes,
+    matches the actual "Extracted labels: A" result observed in the
+    test console) and which is not (procedure-type: a constructed
+    response using a real, verbatim quote, built to exercise the rules
+    path honestly -- not a claim about what a live model would say).
